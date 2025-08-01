@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyTitle>Scorpio core library</AssemblyTitle>
+    
+    <PackageTags>Scorpio;Aspect;dependencyinjection;Modularity</PackageTags>
+  </PropertyGroup>
+
+ 
+
+ 
+  
+  <ItemGroup>
+    <PackageReference Include="Nito.AsyncEx.Context"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical"/>
+    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions"/>
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Bcl.HashCode"/>
+    <PackageReference Include="System.Runtime.Loader"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Scorpio.Utilities\Scorpio.Utilities.csproj" />
+  </ItemGroup>
+</Project>

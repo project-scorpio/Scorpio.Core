@@ -1,0 +1,22 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "Scorpio-Project",
+        "projectKey": "project-scorpio_Scorpio.Core"
+    },
+    "dotnet-test-explorer.testProjectPath": "**/*Tests.csproj",
+    "background.windowBackgrounds": [
+        "c:/Users/zidan/OneDrive/图片/美女图片/年年/美胸/**"
+    ],
+    "background.backgroundOpacity": [
+        0.3,
+        0.1,
+        0.1,
+        0.1
+    ],
+    "background.backgroundChangeTime": [
+        10,
+        0,
+        0,
+        0
+    ]
+}

@@ -404,6 +404,8 @@ FodyWeavers.xsd
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
+**/.sonarlint/
+
 # Local History for Visual Studio Code
 .history/
 
