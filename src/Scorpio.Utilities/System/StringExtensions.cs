@@ -14,6 +14,8 @@ namespace System
     /// </summary>
     public static partial class StringExtensions
     {
+        private const string Pattern = "[a-z][A-Z]";
+
         /// <summary>
         /// 确保字符串以指定字符结尾，如果不是则添加该字符。
         /// </summary>
@@ -337,10 +339,19 @@ namespace System
             {
                 return str;
             }
-
+#if NET7_0_OR_GREATER
             return useCurrentCulture
                 ? MyRegex().Replace(str, m => $"{m.Value[0]} {char.ToLower(m.Value[1])}")
                 : MyRegex().Replace(str, m => $"{m.Value[0]} {char.ToLowerInvariant(m.Value[1])}");
+#else
+            // 使用正则表达式将 camelCase/PascalCase 转换为句子格式
+            // 例如 "ThisIsASample" -> "This is a sample"
+            // 注意：此处使用了 Regex.Replace 方法来处理字符串转换
+            // 如果在 .NET 7.0 或更高版本中，可以使用生成的正则表达式方法 MyRegex() 
+            return useCurrentCulture
+                ? Regex.Replace(str, Pattern, m => $"{m.Value[0]} {char.ToLower(m.Value[1])}")
+                : Regex.Replace(str, Pattern, m => $"{m.Value[0]} {char.ToLowerInvariant(m.Value[1])}");
+#endif
         }
 
         /// <summary>
@@ -356,10 +367,19 @@ namespace System
             {
                 return str;
             }
-
+#if NET7_0_OR_GREATER
             return useCurrentCulture
-                ? Regex.Replace(str, "[a-z][A-Z]", m => m.Value[0] + "-" + char.ToLower(m.Value[1])).ToLower()
-                : Regex.Replace(str, "[a-z][A-Z]", m => m.Value[0] + "-" + char.ToLowerInvariant(m.Value[1])).ToLowerInvariant();
+                ? MyRegex().Replace(str, m => $"{m.Value[0]}-{char.ToLower(m.Value[1])}").ToLower()
+                : MyRegex().Replace(str, m => $"{m.Value[0]}-{char.ToLowerInvariant(m.Value[1])}").ToLowerInvariant();
+#else
+            // 使用正则表达式将 camelCase/PascalCase 转换为连字符格式
+            // 例如 "ThisIsASample" -> "this-is-a-sample"
+            // 注意：此处使用了 Regex.Replace 方法来处理字符串转换
+            // 如果在 .NET 7.0 或更高版本中，可以使用生成的正则表达式方法 MyRegex() 
+            return useCurrentCulture
+                ? Regex.Replace(str, Pattern, m => $"{m.Value[0]}-{char.ToLower(m.Value[1])}").ToLower()
+                : Regex.Replace(str, Pattern, m => $"{m.Value[0]}-{char.ToLowerInvariant(m.Value[1])}").ToLowerInvariant();
+#endif
         }
 
         /// <summary>
@@ -546,7 +566,9 @@ namespace System
             return encoding.GetBytes(str);
         }
 
+#if NET7_0_OR_GREATER
         [GeneratedRegex("[a-z][A-Z]")]
         private static partial Regex MyRegex();
+#endif
     }
 }

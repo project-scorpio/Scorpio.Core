@@ -45,7 +45,6 @@ namespace System.Collections.Generic
         /// <seealso cref="ExpandToString{T}(IEnumerable{T}, string)"/>
         public static string ExpandToString(this IEnumerable<string> source, string separator)
         {
-            Check.NotNull(source, nameof(source));
             return string.Join(separator, source);
         }
 
@@ -65,7 +64,6 @@ namespace System.Collections.Generic
         /// <seealso cref="ExpandToString(IEnumerable{string}, string)"/>
         public static string ExpandToString<T>(this IEnumerable<T> source, string separator)
         {
-            Check.NotNull(source, nameof(source));
             return string.Join(separator, source);
         }
 
@@ -85,9 +83,6 @@ namespace System.Collections.Generic
         /// <seealso cref="Enumerable.Where{TSource}(IEnumerable{TSource}, Func{TSource, bool})"/>
         public static IEnumerable<T> WhereIf<T>(this IEnumerable<T> source, bool condition, Func<T, bool> predicate)
         {
-            Check.NotNull(source, nameof(source));
-            Check.NotNull(predicate, nameof(predicate));
-            
             return condition
                 ? source.Where(predicate)
                 : source;
@@ -108,9 +103,6 @@ namespace System.Collections.Generic
         /// <seealso cref="Enumerable.Where{TSource}(IEnumerable{TSource}, Func{TSource, int, bool})"/>
         public static IEnumerable<T> WhereIf<T>(this IEnumerable<T> source, bool condition, Func<T, int, bool> predicate)
         {
-            Check.NotNull(source, nameof(source));
-            Check.NotNull(predicate, nameof(predicate));
-            
             return condition
                 ? source.Where(predicate)
                 : source;
@@ -131,10 +123,8 @@ namespace System.Collections.Generic
         /// <seealso cref="Action{T}"/>
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
-            Check.NotNull(source, nameof(source));
-            Check.NotNull(action, nameof(action));
             
-            if (source.IsNullOrEmpty())
+            if (source.IsNullOrEmpty() || action == null)
             {
                 return;
             }
@@ -161,11 +151,8 @@ namespace System.Collections.Generic
         /// <seealso cref="CancellationToken"/>
         /// <seealso cref="Task"/>
         public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> action, CancellationToken cancellationToken = default)
-        {
-            Check.NotNull(source, nameof(source));
-            Check.NotNull(action, nameof(action));
-            
-            if (source.IsNullOrEmpty())
+        {            
+            if (source.IsNullOrEmpty() || action == null)
             {
                 return;
             }
@@ -196,10 +183,7 @@ namespace System.Collections.Generic
         /// <seealso cref="Task"/>
         public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, CancellationToken, Task> action, CancellationToken cancellationToken = default)
         {
-            Check.NotNull(source, nameof(source));
-            Check.NotNull(action, nameof(action));
-            
-            if (source.IsNullOrEmpty())
+            if (source.IsNullOrEmpty() || action == null)
             {
                 return;
             }
