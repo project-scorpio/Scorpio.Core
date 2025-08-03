@@ -116,7 +116,7 @@ namespace System.Collections.Generic
         {
             IEnumerable<int> enumerable = new List<int> { 3, 4, 5 };
             var visitedItems = new List<int>();
-            var cs = new CancellationTokenSource();
+            using var cs = new CancellationTokenSource();
             enumerable.ForEachAsync(i =>
             {
                 visitedItems.Add(i);
@@ -137,7 +137,7 @@ namespace System.Collections.Generic
         {
             IEnumerable<int> enumerable = new List<int> { 3, 4, 5 };
             var visitedItems = new List<int>();
-            var cs = new CancellationTokenSource();
+            using var cs = new CancellationTokenSource();
             enumerable.ForEachAsync((i, c) =>
             {
                 visitedItems.Add(i);
@@ -161,25 +161,28 @@ namespace System.Collections.Generic
             enumerable.AnyAsync(i => Task.FromResult(i == 6)).Result.ShouldBeFalse();
             enumerable.AnyAsync((i, c) => Task.FromResult(i == 4)).Result.ShouldBeTrue();
             enumerable.AnyAsync((i, c) => Task.FromResult(i == 6)).Result.ShouldBeFalse();
-            var cs = new CancellationTokenSource();
-            Should.Throw<OperationCanceledException>(() => enumerable.AnyAsync(i =>
+            using (var cs = new CancellationTokenSource())
             {
-                if (i == 3)
+                Should.Throw<OperationCanceledException>(() => enumerable.AnyAsync(i =>
                 {
-                    cs.Cancel();
-                }
-                return Task.FromResult(i == 4);
-            }, cs.Token));
-            cs = new CancellationTokenSource();
-            Should.Throw<OperationCanceledException>(() => enumerable.AnyAsync((i, c) =>
+                    if (i == 3)
+                    {
+                        cs.Cancel();
+                    }
+                    return Task.FromResult(i == 4);
+                }, cs.Token));
+            }
+            using (var cs = new CancellationTokenSource())
             {
-                if (i == 3)
+                Should.Throw<OperationCanceledException>(() => enumerable.AnyAsync((i, c) =>
                 {
-                    cs.Cancel();
-                }
-                return Task.FromResult(i == 4);
-            }, cs.Token));
-
+                    if (i == 3)
+                    {
+                        cs.Cancel();
+                    }
+                    return Task.FromResult(i == 4);
+                }, cs.Token));
+            }
         }
 
         [Fact]
@@ -190,24 +193,28 @@ namespace System.Collections.Generic
             enumerable.AllAsync(i => Task.FromResult(i == 4)).Result.ShouldBeFalse();
             enumerable.AllAsync((i, c) => Task.FromResult(i < 6)).Result.ShouldBeTrue();
             enumerable.AllAsync((i, c) => Task.FromResult(i == 4)).Result.ShouldBeFalse();
-            var cs = new CancellationTokenSource();
-            Should.Throw<OperationCanceledException>(() => enumerable.AllAsync(i =>
+            using (var cs = new CancellationTokenSource())
             {
-                if (i == 3)
+                Should.Throw<OperationCanceledException>(() => enumerable.AllAsync(i =>
                 {
-                    cs.Cancel();
-                }
-                return Task.FromResult(i < 6);
-            }, cs.Token));
-            cs = new CancellationTokenSource();
-            Should.Throw<OperationCanceledException>(() => enumerable.AllAsync((i, c) =>
+                    if (i == 3)
+                    {
+                        cs.Cancel();
+                    }
+                    return Task.FromResult(i < 6);
+                }, cs.Token));
+            }
+            using (var cs = new CancellationTokenSource())
             {
-                if (i == 3)
+                Should.Throw<OperationCanceledException>(() => enumerable.AllAsync((i, c) =>
                 {
-                    cs.Cancel();
-                }
-                return Task.FromResult(i < 6);
-            }, cs.Token));
+                    if (i == 3)
+                    {
+                        cs.Cancel();
+                    }
+                    return Task.FromResult(i < 6);
+                }, cs.Token));
+            }
 
         }
     }

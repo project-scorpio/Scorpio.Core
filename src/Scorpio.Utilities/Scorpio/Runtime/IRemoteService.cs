@@ -14,7 +14,6 @@
     /// 框架可以通过检查类型是否实现此接口来应用特定的处理逻辑，
     /// 如代理生成、网络通信配置、序列化处理等。
     /// </remarks>
-    /// <seealso cref="System.Runtime.Remoting"/>
     public interface IRemoteService
     {
     }
