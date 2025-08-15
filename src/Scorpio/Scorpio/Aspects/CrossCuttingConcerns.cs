@@ -57,7 +57,7 @@ namespace Scorpio.Aspects
             }
 
             // 获取未代理的原始对象
-            if (!(obj.UnProxy() is IAvoidDuplicateCrossCuttingConcerns crossCuttingEnabledObj))
+            if (obj.UnProxy() is not IAvoidDuplicateCrossCuttingConcerns crossCuttingEnabledObj)
             {
                 return;
             }

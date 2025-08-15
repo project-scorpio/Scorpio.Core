@@ -165,6 +165,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.ShouldContainTransient(typeof(IService1), typeof(Service1));
             services.ShouldNotContainService(typeof(IService1), typeof(Service2));
             Should.Throw<ArgumentException>(() => services.ReplaceEnumerable<IService1, IService1, Service2>());
+            Should.Throw<ArgumentException>(() => services.ReplaceEnumerable<object, object, object>());
             services.ReplaceEnumerable<IService1, Service1, Service2>();
             services.ShouldContainTransient(typeof(IService1), typeof(Service2));
             services.ShouldNotContainService(typeof(IService1), typeof(Service1));
@@ -178,6 +179,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IService1, Service1>();
             services.ShouldContainTransient(typeof(IService1), typeof(Service1));
             Should.Throw<ArgumentException>(() => services.RemoveEnumerable<IService1, IService1>());
+            Should.Throw<ArgumentException>(() => services.RemoveEnumerable(new ServiceDescriptor(typeof(IService1), typeof(object), ServiceLifetime.Transient)));
             services.RemoveEnumerable<IService1, Service2>();
             services.ShouldContainTransient(typeof(IService1), typeof(Service1));
             services.RemoveEnumerable<IService1, Service1>();

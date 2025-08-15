@@ -11,6 +11,8 @@ namespace Scorpio.Conventional
     /// </summary>
     internal class ConventionalRegistrationContext : IConventionalRegistrationContext
     {
+        public Assembly Assembly { get; }
+
         /// <summary>
         /// 获取服务集合实例
         /// </summary>
@@ -32,6 +34,7 @@ namespace Scorpio.Conventional
         {
             // 获取程序集中的所有类型
             Types = assembly.GetTypes();
+            Assembly = assembly;
             Services = services;
         }
     }
