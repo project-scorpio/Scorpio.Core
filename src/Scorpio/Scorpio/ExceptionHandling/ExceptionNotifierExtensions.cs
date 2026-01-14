@@ -51,7 +51,7 @@ namespace Scorpio.ExceptionHandling
         /// <seealso cref="IExceptionNotifier.NotifyAsync(ExceptionNotificationContext)"/>
         /// <seealso cref="ExceptionNotificationContext"/>
         public static Task NotifyAsync(
-            this IExceptionNotifier exceptionNotifier, 
+            this IExceptionNotifier exceptionNotifier,
             Exception exception,
             LogLevel? logLevel = null,
             bool handled = true)

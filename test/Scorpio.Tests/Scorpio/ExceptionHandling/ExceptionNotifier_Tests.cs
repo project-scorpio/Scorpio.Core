@@ -47,8 +47,8 @@ namespace Scorpio.ExceptionHandling
             provider.Configure().GetService(typeof(IEnumerable<IExceptionSubscriber>)).Returns(new List<IExceptionSubscriber> { subscriber });
             factory.Configure().CreateScope().Returns(scope);
             var notifier = Should.NotThrow(() => new ExceptionNotifier(factory));
-            var logger=Substitute.For<ILogger<ExceptionNotifier>>();
-            notifier.Logger=logger;
+            var logger = Substitute.For<ILogger<ExceptionNotifier>>();
+            notifier.Logger = logger;
             var context = new ExceptionNotificationContext(new ScorpioException());
             Should.NotThrow(() => notifier.NotifyAsync(context));
             subscriber.Received(1).HandleAsync(context);

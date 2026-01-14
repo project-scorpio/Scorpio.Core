@@ -25,7 +25,7 @@ namespace Scorpio.Aspects
         /// <seealso cref="ProxyHelper.UnProxy"/>
         public static void AddApplied(object obj, params string[] concerns)
         {
-            
+
             // 验证参数不为空
             Check.NotNull(obj, nameof(obj));
             if (concerns.IsNullOrEmpty())
@@ -131,7 +131,7 @@ namespace Scorpio.Aspects
         {
             // 验证参数不为空
             Check.NotNull(obj, nameof(obj));
-            
+
             // 获取未代理的原始对象
             if (!(obj.UnProxy() is IAvoidDuplicateCrossCuttingConcerns crossCuttingEnabledObj))
             {

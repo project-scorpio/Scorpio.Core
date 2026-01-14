@@ -15,12 +15,12 @@ namespace Scorpio.Options
         /// 用于配置选项的操作集合
         /// </summary>
         private readonly IEnumerable<IConfigureOptions<TOptions>> _setups;
-        
+
         /// <summary>
         /// 用于后配置选项的操作集合
         /// </summary>
         private readonly IEnumerable<IPostConfigureOptions<TOptions>> _postConfigures;
-        
+
         /// <summary>
         /// 用于预配置选项的操作集合
         /// </summary>
@@ -50,13 +50,13 @@ namespace Scorpio.Options
         {
             // 创建新的选项实例
             var options = new TOptions();
-            
+
             // 第一阶段：执行预配置操作
             foreach (var post in _preConfigureOptions)
             {
                 post.PreConfigure(name, options);
             }
-            
+
             // 第二阶段：执行配置操作
             foreach (var setup in _setups)
             {
@@ -71,7 +71,7 @@ namespace Scorpio.Options
                     setup.Configure(options);
                 }
             }
-            
+
             // 第三阶段：执行后配置操作
             foreach (var post in _postConfigures)
             {

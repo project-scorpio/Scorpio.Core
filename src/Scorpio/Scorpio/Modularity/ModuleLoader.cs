@@ -168,7 +168,7 @@ namespace Scorpio.Modularity
         /// 该方法创建模块实例并将其注册到服务容器，然后创建对应的模块描述符。
         /// 派生类可以重写此方法来自定义模块描述符的创建逻辑。
         /// </remarks>
-        protected virtual ModuleDescriptor CreateModuleDescriptor(IServiceCollection services, Type moduleType, bool isLoadedAsPlugIn = false) => 
+        protected virtual ModuleDescriptor CreateModuleDescriptor(IServiceCollection services, Type moduleType, bool isLoadedAsPlugIn = false) =>
             new ModuleDescriptor(moduleType, CreateAndRegisterModule(services, moduleType), isLoadedAsPlugIn);
 
         /// <summary>
@@ -232,11 +232,11 @@ namespace Scorpio.Modularity
             // 遍历模块的每个依赖类型
             foreach (var dependedModuleType in ModuleHelper.FindDependedModuleTypes(module.Type))
             {
-                #pragma warning disable S112 
+#pragma warning disable S112
                 // 在模块列表中查找依赖模块
-                var dependedModule = modules.FirstOrDefault(m => m.Type == dependedModuleType) 
-                    ?? throw new NullReferenceException($"Could not find a depended module {dependedModuleType.AssemblyQualifiedName} for { module.Type.AssemblyQualifiedName}");
-                #pragma warning restore S112
+                var dependedModule = modules.FirstOrDefault(m => m.Type == dependedModuleType)
+                    ?? throw new NullReferenceException($"Could not find a depended module {dependedModuleType.AssemblyQualifiedName} for {module.Type.AssemblyQualifiedName}");
+#pragma warning restore S112
                 // 添加依赖关系
                 module.AddDependency(dependedModule);
             }

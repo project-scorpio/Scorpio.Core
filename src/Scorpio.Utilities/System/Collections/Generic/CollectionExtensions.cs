@@ -102,7 +102,7 @@ namespace System.Collections.Generic
             Check.NotNull(source, nameof(source));
             Check.NotNull(predicate, nameof(predicate));
             Check.NotNull(itemFactory, nameof(itemFactory));
-            
+
             if (source.Any(predicate))
             {
                 return false;
@@ -146,7 +146,7 @@ namespace System.Collections.Generic
                 }
                 return result;
             }
-            
+
             var items = source.Where(predicate).ToList();
             foreach (var item in items)
             {
@@ -174,7 +174,7 @@ namespace System.Collections.Generic
         {
             Check.NotNull(source, nameof(source));
             Check.NotNull(selector, nameof(selector));
-            
+
             if (!source.Any(selector))
             {
                 return @default;
@@ -204,7 +204,7 @@ namespace System.Collections.Generic
             Check.NotNull(source, nameof(source));
             Check.NotNull(selector, nameof(selector));
             Check.NotNull(factory, nameof(factory));
-            
+
             if (!source.Any(selector))
             {
                 var result = factory();

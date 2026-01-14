@@ -22,7 +22,7 @@ namespace Scorpio
         /// 指示应用程序是否已关闭的标志
         /// </summary>
         private bool _isShutdown = false;
-        
+
         /// <summary>
         /// 服务工厂适配器的延迟初始化实例
         /// </summary>

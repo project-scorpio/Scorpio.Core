@@ -15,6 +15,6 @@ namespace Scorpio.DynamicProxy
         /// </summary>
         /// <param name="invocation">方法调用信息，包含方法参数、返回值等详细信息 <see cref="IMethodInvocation"/></param>
         /// <returns>表示异步操作的任务 <see cref="Task"/></returns>
-         Task InterceptAsync(IMethodInvocation invocation);
+        Task InterceptAsync(IMethodInvocation invocation);
     }
 }

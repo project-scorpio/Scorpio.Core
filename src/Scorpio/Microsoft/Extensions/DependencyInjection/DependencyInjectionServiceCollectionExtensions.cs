@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>返回 <see cref="IServiceCollection"/>，支持链式调用</returns>
         /// <exception cref="MissingMethodException">当类型 <typeparamref name="T"/> 没有公共无参构造函数时抛出</exception>
         public static IServiceCollection AddConventionalRegistrar<T>(this IServiceCollection services)
-          where T : IConventionalRegistrar => 
+          where T : IConventionalRegistrar =>
             // 使用 Activator.CreateInstance 创建注册器实例，要求 T 类型必须有公共无参构造函数
             services.AddConventionalRegistrar(Activator.CreateInstance<T>());
 
@@ -50,7 +50,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             // 创建约定注册上下文，包含程序集和服务集合信息
             var context = new ConventionalRegistrationContext(assembly, services);
-            
+
             // 获取所有注册器并依次执行注册逻辑
             GetOrCreateRegistrarList(services).ForEach(registrar => registrar.Register(context));
             return services;
@@ -83,7 +83,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">服务集合，用于注册依赖注入服务</param>
         /// <returns>返回 <see cref="IServiceCollection"/>，支持链式调用</returns>
         /// <seealso cref="RegisterAssemblyByConvention(IServiceCollection, Assembly)"/>
-        public static IServiceCollection RegisterAssemblyByConventionOfType<T>(this IServiceCollection services) => 
+        public static IServiceCollection RegisterAssemblyByConventionOfType<T>(this IServiceCollection services) =>
             // 通过类型 T 获取其所在的程序集，然后进行约定注册
             services.RegisterAssemblyByConvention(typeof(T).GetTypeInfo().Assembly);
 
@@ -95,7 +95,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">服务集合，用于存储和获取注册器列表</param>
         /// <returns>约定注册器列表，包含所有已注册的约定注册器</returns>
         /// <seealso cref="ConventionalRegistrarList"/>
-        private static ConventionalRegistrarList GetOrCreateRegistrarList(IServiceCollection services) => 
+        private static ConventionalRegistrarList GetOrCreateRegistrarList(IServiceCollection services) =>
             // 使用扩展方法获取单例实例，如果不存在则通过工厂方法创建新实例
             services.GetSingletonInstanceOrAdd(s => new ConventionalRegistrarList());
     }

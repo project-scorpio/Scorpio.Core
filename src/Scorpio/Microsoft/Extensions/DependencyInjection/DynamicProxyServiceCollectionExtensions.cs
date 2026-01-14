@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection RegisterConventionalInterceptor(
             this IServiceCollection services,
             IEnumerable<Type> types,
-            Action<IConventionalConfiguration<ConventionalInterceptorAction>> configureAction) => 
+            Action<IConventionalConfiguration<ConventionalInterceptorAction>> configureAction) =>
             // 委托给通用的约定操作处理方法，实现拦截器的自动注册
             services.DoConventionalAction(types, configureAction);
     }

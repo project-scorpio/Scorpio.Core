@@ -23,6 +23,7 @@ namespace Scorpio.Conventional
         /// </summary>
         /// <value>依赖注入服务集合 <see cref="IServiceCollection"/></value>
         IServiceCollection Services { get; }
+        /// <inheritdoc/>
         Assembly Assembly { get; }
     }
 }

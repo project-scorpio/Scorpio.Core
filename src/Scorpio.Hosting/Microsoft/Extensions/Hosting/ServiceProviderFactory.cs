@@ -17,17 +17,17 @@ namespace Microsoft.Extensions.Hosting
         /// 主机构建器上下文，包含配置信息和托管环境信息
         /// </summary>
         private readonly HostBuilderContext _context;
-        
+
         /// <summary>
         /// 启动模块类型，用于初始化 Scorpio 应用程序
         /// </summary>
         private readonly Type _startupModuleType;
-        
+
         /// <summary>
         /// 引导程序创建选项的配置委托
         /// </summary>
         private readonly Action<BootstrapperCreationOptions> _optionsAction;
-        
+
         /// <summary>
         /// Scorpio 内部引导程序实例，负责应用程序的初始化和生命周期管理
         /// </summary>
@@ -69,13 +69,13 @@ namespace Microsoft.Extensions.Hosting
         {
             // 创建 Scorpio 内部引导程序实例
             _bootstrapper = new InternalBootstrapper(_startupModuleType, services, _context.Configuration, _optionsAction);
-            
+
             // 将托管环境信息添加到引导程序的共享属性中，供模块使用
             _bootstrapper.Properties["HostingEnvironment"] = _context.HostingEnvironment;
-            
+
             // 将引导程序注册为单例服务，使其可被依赖注入
             services.AddSingleton(_bootstrapper);
-            
+
             return services;
         }
 
@@ -94,23 +94,23 @@ namespace Microsoft.Extensions.Hosting
         {
             // 使用引导程序创建服务提供者
             var serviceProvider = _bootstrapper.CreateServiceProvider(containerBuilder);
-            
+
             // 设置引导程序的内部服务提供者引用
             _bootstrapper.SetServiceProviderInternal(serviceProvider);
-            
+
             // 获取应用程序生命周期管理服务
             var applicationLifetime = serviceProvider.GetRequiredService<IHostApplicationLifetime>();
-            
+
             // 注册应用程序停止时的清理回调
             // 当应用程序开始停止时，关闭 Scorpio 引导程序
             applicationLifetime.ApplicationStopping.Register(() => _bootstrapper.Shutdown());
-            
+
             // 当应用程序完全停止时，释放引导程序资源
             applicationLifetime.ApplicationStopped.Register(() => (_bootstrapper as IDisposable).Dispose());
-            
+
             // 初始化 Scorpio 应用程序和所有模块
             _bootstrapper.Initialize();
-            
+
             return serviceProvider;
         }
     }

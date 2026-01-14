@@ -31,7 +31,7 @@ namespace Scorpio
         /// <exception cref="ArgumentNullException">
         /// 当 <paramref name="serviceProviderFactory"/> 为 null 时抛出
         /// </exception>
-        public ServiceFactoryAdapter(IServiceProviderFactory<TContainerBuilder> serviceProviderFactory) 
+        public ServiceFactoryAdapter(IServiceProviderFactory<TContainerBuilder> serviceProviderFactory)
             => _serviceProviderFactory = serviceProviderFactory ?? throw new ArgumentNullException(nameof(serviceProviderFactory));
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Scorpio
         /// <exception cref="InvalidCastException">
         /// 当 <paramref name="containerBuilder"/> 无法转换为 <typeparamref name="TContainerBuilder"/> 类型时抛出
         /// </exception>
-        public IServiceProvider CreateServiceProvider(object containerBuilder) 
+        public IServiceProvider CreateServiceProvider(object containerBuilder)
             => _serviceProviderFactory.CreateServiceProvider((TContainerBuilder)containerBuilder);
     }
 }

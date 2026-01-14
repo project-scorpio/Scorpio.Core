@@ -299,7 +299,7 @@ namespace System.Reflection
                 var genericType = type.GetGenericTypeDefinition();
                 return $"{genericType.FullName.Left(genericType.FullName.IndexOf('`'))}<{type.GenericTypeArguments.Select(GetSimplifiedName).ExpandToString(",")}>";
             }
-            
+
             // 将常用类型映射为简化名称
             if (type == typeof(string)
                 || type == typeof(char)

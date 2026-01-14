@@ -17,10 +17,10 @@ namespace Microsoft.Extensions.DependencyInjection
             var services = new ServiceCollection();
             var types = new List<Type> { typeof(string) };
             Action<IConventionalConfiguration<ConventionalInterceptorAction>> configureAction = config => { };
-            
+
             // Act
             var result = services.RegisterConventionalInterceptor(types, configureAction);
-            
+
             // Assert
             Assert.Same(services, result);
         }
@@ -32,11 +32,11 @@ namespace Microsoft.Extensions.DependencyInjection
             var mockServices = new Mock<IServiceCollection>();
             var types = new List<Type> { typeof(string) };
             Action<IConventionalConfiguration<ConventionalInterceptorAction>> configureAction = config => { };
-        
-            
+
+
             // Act
             var result = mockServices.Object.RegisterConventionalInterceptor(types, configureAction);
-            
+
             // Assert
             Assert.Same(mockServices.Object, result);
         }

@@ -16,7 +16,7 @@ namespace System
         /// <param name="minInclusiveValue">最小值（包含）</param>
         /// <param name="maxInclusiveValue">最大值（包含）</param>
         /// <returns>如果值在指定范围内（包含边界值），则返回 true；否则返回 false</returns>
-        public static bool IsBetween<T>(this T value, T minInclusiveValue, T maxInclusiveValue) where T : IComparable<T> 
+        public static bool IsBetween<T>(this T value, T minInclusiveValue, T maxInclusiveValue) where T : IComparable<T>
             => value.CompareTo(minInclusiveValue) >= 0 && value.CompareTo(maxInclusiveValue) <= 0;
 
         /// <summary>

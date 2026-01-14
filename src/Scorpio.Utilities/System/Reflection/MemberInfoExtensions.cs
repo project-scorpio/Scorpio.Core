@@ -130,7 +130,7 @@ namespace System.Reflection
         /// <param name="member">成员元数据对象</param>
         /// <param name="inherit">是否搜索成员的继承链以查找特性</param>
         /// <returns>返回 <see cref="DisplayAttribute"/> 特性，如不存在则返回 null</returns>
-        private static DisplayAttribute GetDisplayAttribute(this MemberInfo member, bool inherit = false) 
+        private static DisplayAttribute GetDisplayAttribute(this MemberInfo member, bool inherit = false)
             => member.GetAttribute<DisplayAttribute>(inherit: inherit);
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace System.Reflection
         /// <param name="defaultValue">如果未找到特性，则返回的默认值（默认为 default）</param>
         /// <returns>匹配 <typeparamref name="TAttribute"/> 的自定义特性，如果未找到则返回 <paramref name="defaultValue"/></returns>
         /// <exception cref="ArgumentNullException"><paramref name="object"/> 为 null 时抛出</exception>
-        public static TAttribute GetAttribute<TAttribute>(this object @object, bool inherit = false, TAttribute defaultValue = default) 
+        public static TAttribute GetAttribute<TAttribute>(this object @object, bool inherit = false, TAttribute defaultValue = default)
             => @object.GetAttributes<TAttribute>(inherit).FirstOrDefault() ?? defaultValue;
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace System.Reflection
         /// <param name="defaultValue">如果未找到特性，则返回的默认值（默认为 default）</param>
         /// <returns>匹配 <typeparamref name="TAttribute"/> 的自定义特性，如果未找到则返回 <paramref name="defaultValue"/></returns>
         /// <exception cref="ArgumentNullException"><paramref name="memberInfo"/> 为 null 时抛出</exception>
-        public static TAttribute GetAttribute<TAttribute>(this MemberInfo memberInfo, bool inherit = false, TAttribute defaultValue = default) 
+        public static TAttribute GetAttribute<TAttribute>(this MemberInfo memberInfo, bool inherit = false, TAttribute defaultValue = default)
             => memberInfo.GetAttributes<TAttribute>(inherit).FirstOrDefault() ?? defaultValue;
 
         /// <summary>
@@ -234,8 +234,8 @@ namespace System.Reflection
         /// <param name="inherit">是否搜索继承链以查找特性</param>
         /// <returns>如果找到匹配 <typeparamref name="TAttribute"/> 的特性则返回 true，否则返回 false</returns>
         /// <exception cref="ArgumentNullException"><paramref name="memberInfo"/> 为 null 时抛出</exception>
-        public static bool AttributeExists<TAttribute>(this MemberInfo memberInfo, bool inherit = false) where TAttribute : Attribute 
-            => memberInfo.GetAttribute<TAttribute>(inherit:inherit) != null;
+        public static bool AttributeExists<TAttribute>(this MemberInfo memberInfo, bool inherit = false) where TAttribute : Attribute
+            => memberInfo.GetAttribute<TAttribute>(inherit: inherit) != null;
 
         /// <summary>
         /// 通过表达式获取指定属性的 <see cref="MemberInfo"/> 对象。

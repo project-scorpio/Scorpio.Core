@@ -364,17 +364,17 @@ namespace System.Linq
         ///     存储无选择器 Average 方法的字典
         /// </summary>
         private static Dictionary<Type, MethodInfo> AverageWithoutSelectorMethods { get; }
-        
+
         /// <summary>
         ///     存储有选择器 Average 方法的字典
         /// </summary>
         private static Dictionary<Type, MethodInfo> AverageWithSelectorMethods { get; }
-        
+
         /// <summary>
         ///     存储无选择器 Sum 方法的字典
         /// </summary>
         private static Dictionary<Type, MethodInfo> SumWithoutSelectorMethods { get; }
-        
+
         /// <summary>
         ///     存储有选择器 Sum 方法的字典
         /// </summary>

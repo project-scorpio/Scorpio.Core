@@ -60,7 +60,7 @@
         /// 可用于将表达式从 <typeparamref name="T1"/>、<typeparamref name="T2"/>、<typeparamref name="T3"/> 和 <typeparamref name="T4"/> 类型参数转换为其他类型参数。
         /// </returns>
         public static IExpressionTranslation<T1, T2, T3, T4, TResult> Translate<T1, T2, T3, T4, TResult>(this Expression<Func<T1, T2, T3, T4, TResult>> predicate) => new ExpressionTranslation<T1, T2, T3, T4, TResult>(predicate);
-        
+
         /// <summary>
         /// 创建成员初始化表达式的翻译器。
         /// </summary>

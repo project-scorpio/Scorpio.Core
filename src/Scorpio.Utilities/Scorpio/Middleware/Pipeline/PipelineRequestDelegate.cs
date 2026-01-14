@@ -22,6 +22,7 @@ namespace Scorpio.Middleware.Pipeline
     /// <item><description>调用下一个中间件继续管道执行</description></item>
     /// <item><description>短路管道执行，直接返回结果</description></item>
     /// </list>
+    /// 
     /// 使用协变泛型 <c>in</c> 修饰符，允许委托类型的协变转换。
     /// </remarks>
     /// <seealso cref="IPipelineBuilder{TPipelineContext}"/>

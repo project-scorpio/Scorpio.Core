@@ -16,7 +16,7 @@ namespace Scorpio.Conventional
         /// 用于存储键值对项目的字典
         /// </summary>
         private readonly Dictionary<string, object> _items = new Dictionary<string, object>();
-        
+
         /// <summary>
         /// 所有可用的类型集合
         /// </summary>

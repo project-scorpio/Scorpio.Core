@@ -54,9 +54,9 @@ namespace Scorpio.Initialization
         /// 方法获取，如果类型未标记特性则使用默认值 0。
         /// </para>
         /// </remarks>
-        protected override void Action(IConventionalContext context) => 
-            context.Types.ForEach(t => 
-                context.Services.Configure<InitializationOptions>(opts => 
+        protected override void Action(IConventionalContext context) =>
+            context.Types.ForEach(t =>
+                context.Services.Configure<InitializationOptions>(opts =>
                     opts.AddInitializable(t, InitializationOrderAttribute.GetOrder(t))));
     }
 }

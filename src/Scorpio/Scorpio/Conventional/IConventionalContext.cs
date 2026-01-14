@@ -34,7 +34,7 @@ namespace Scorpio.Conventional
     /// 泛型约定上下文接口，继承自 <see cref="IConventionalContext"/>
     /// </summary>
     /// <typeparam name="TAction">约定操作类型参数，用于指定特定的约定操作</typeparam>
-#pragma warning disable S2326 
+#pragma warning disable S2326
     public interface IConventionalContext<out TAction> : IConventionalContext
     {
 

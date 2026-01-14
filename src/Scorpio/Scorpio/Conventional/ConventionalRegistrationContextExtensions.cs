@@ -34,7 +34,7 @@ namespace Scorpio.Conventional
         /// <returns>返回约定注册上下文实例以支持链式调用 <see cref="IConventionalRegistrationContext"/></returns>
         public static IConventionalRegistrationContext RegisterConventionalDependencyInject(this IConventionalRegistrationContext context, Action<IConventionalConfiguration<ConventionalDependencyAction>> configureAction) => context.DoConventionalAction(configureAction);
 
-           /// <summary>
+        /// <summary>
         /// 在约定注册上下文中注册约定拦截器
         /// </summary>
         /// <param name="context">约定注册上下文实例</param>

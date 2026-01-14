@@ -57,7 +57,7 @@ namespace Scorpio.Linq
         /// 并使用 <see cref="Task.FromResult{TResult}(TResult)"/> 包装结果。
         /// 对于真正的异步数据源，建议使用专门的实现类。
         /// </remarks>
-        public Task<int> CountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default) => 
+        public Task<int> CountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default) =>
             Task.FromResult(queryable.Count());
 
 
@@ -81,7 +81,7 @@ namespace Scorpio.Linq
         /// 该实现内部调用同步的 <see cref="Enumerable.ToList{TSource}(IEnumerable{TSource})"/> 方法，
         /// 并使用 <see cref="Task.FromResult{TResult}(TResult)"/> 包装结果。
         /// </remarks>
-        public Task<List<T>> ToListAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default) => 
+        public Task<List<T>> ToListAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default) =>
             Task.FromResult(queryable.ToList());
 #pragma warning restore CS1574 // XML 注释中有无法解析的 cref 特性
 
@@ -104,7 +104,7 @@ namespace Scorpio.Linq
         /// 该实现内部调用同步的 <see cref="Queryable.FirstOrDefault{TSource}(IQueryable{TSource})"/> 方法，
         /// 并使用 <see cref="Task.FromResult{TResult}(TResult)"/> 包装结果。
         /// </remarks>
-        public Task<T> FirstOrDefaultAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default) => 
+        public Task<T> FirstOrDefaultAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default) =>
             Task.FromResult(queryable.FirstOrDefault());
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Scorpio.Linq
             {
                 return asyncEnumerable;
             }
-            
+
             // 如果不支持异步枚举，抛出异常
             throw new InvalidOperationException($"查询对象 {sources.GetType().Name} 不支持异步枚举操作。请使用支持异步操作的数据源或专门的执行器实现。");
         }

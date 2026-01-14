@@ -48,6 +48,6 @@ namespace Scorpio
         /// 当类名为 null 或 <see cref="Exception.HResult"/> 为零 (0) 时抛出
         /// </exception>
         protected ScorpioException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-    #endif
+#endif
     }
 }

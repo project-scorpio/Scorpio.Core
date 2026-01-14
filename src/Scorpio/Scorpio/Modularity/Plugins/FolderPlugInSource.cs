@@ -20,7 +20,7 @@ namespace Scorpio.Modularity.Plugins
         /// 要扫描的文件夹路径
         /// </summary>
         private readonly string _path;
-        
+
         /// <summary>
         /// 插件源列表的引用，用于访问程序集加载上下文和文件提供程序
         /// </summary>
@@ -104,7 +104,7 @@ namespace Scorpio.Modularity.Plugins
             var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
             // 添加匹配模式：递归搜索所有 .dll 和 .exe 文件
             matcher.AddInclude("./**/*.dll").AddInclude("./**/*.exe");
-            
+
             // 获取目录中所有匹配的程序集文件
             var assemblyFiles = _plugInSourceLists.FileProvider.GetDirectoryContents(_path)
                 .Where(f => matcher.Match(f.PhysicalPath).HasMatches);
@@ -114,7 +114,7 @@ namespace Scorpio.Modularity.Plugins
             {
                 assemblyFiles = assemblyFiles.Where(f => Filter(f.Name));
             }
-            
+
             // 通过程序集加载上下文从文件流中加载每个程序集并返回
             return assemblyFiles.Select(f => _plugInSourceLists.AssemblyLoadContext.LoadFromStream(f.CreateReadStream()));
         }

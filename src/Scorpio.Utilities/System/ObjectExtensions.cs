@@ -141,7 +141,7 @@ namespace System
         /// <param name="condition">确定是否执行操作的条件函数</param>
         /// <param name="action">条件为 true 时要执行的操作</param>
         /// <returns>操作后的原始对象</returns>
-        public static T Action<T>(this T obj, Func<T,bool> condition, Action<T> action)
+        public static T Action<T>(this T obj, Func<T, bool> condition, Action<T> action)
         {
             if (condition(obj))
             {

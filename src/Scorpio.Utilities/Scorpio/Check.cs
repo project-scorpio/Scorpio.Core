@@ -82,7 +82,7 @@ namespace Scorpio
 
             return value;
         }
-        
+
         /// <summary>
         /// 检查指定的值不为 null 或默认值
         /// </summary>
@@ -103,7 +103,7 @@ namespace Scorpio
             }
 
             return value;
-        }      
+        }
 
         /// <summary>
         /// 检查指定的字符串不为 null、空字符串或仅包含空白字符

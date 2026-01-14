@@ -62,7 +62,7 @@ namespace Microsoft.Extensions.Logging
             // 如果异常包含错误代码，则记录
             if (exception is IHasErrorCode exceptionWithErrorCode)
             {
-                logger.Log(logLevel, "Code:{Code}" , exceptionWithErrorCode.Code);
+                logger.Log(logLevel, "Code:{Code}", exceptionWithErrorCode.Code);
             }
 
             // 如果异常包含错误详细信息，则记录
@@ -111,7 +111,7 @@ namespace Microsoft.Extensions.Logging
             // 收集所有需要自记录的异常
             var loggingExceptions = new List<IExceptionWithSelfLogging>();
             LogSelfLogging(loggingExceptions, exception);
-            
+
             // 执行每个异常的自记录逻辑
             foreach (var ex in loggingExceptions)
             {

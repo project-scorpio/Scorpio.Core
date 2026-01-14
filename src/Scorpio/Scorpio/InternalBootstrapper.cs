@@ -32,7 +32,7 @@ namespace Scorpio
         /// 用于配置引导程序创建选项的委托，
         /// 允许自定义引导程序的行为和设置
         /// </param>
-        public InternalBootstrapper(Type startupModuleType, IServiceCollection services, IConfiguration configuration, Action<BootstrapperCreationOptions> optionsAction) 
+        public InternalBootstrapper(Type startupModuleType, IServiceCollection services, IConfiguration configuration, Action<BootstrapperCreationOptions> optionsAction)
             : base(startupModuleType, services, configuration, optionsAction)
         {
             // 构造函数主体为空，所有初始化逻辑由基类处理
@@ -50,10 +50,10 @@ namespace Scorpio
         {
             // 首先调用基类的释放方法
             base.Dispose(disposing);
-            
+
             // 安全地释放配置对象
             Configuration.SafelyDispose();
-            
+
             // 安全地释放服务提供者
             ServiceProvider.SafelyDispose();
         }

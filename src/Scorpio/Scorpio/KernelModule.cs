@@ -29,10 +29,10 @@ namespace Scorpio
         {
             // 替换默认的选项工厂实现，使用 Scorpio 定制的选项工厂
             context.Services.ReplaceOrAdd(ServiceDescriptor.Transient(typeof(IOptionsFactory<>), typeof(Options.OptionsFactory<>)), true);
-            
+
             // 添加基础约定注册器，用于处理标准的依赖注入约定
             context.AddConventionalRegistrar(new BasicConventionalRegistrar());
-            
+
             // 添加初始化约定注册器，用于处理初始化相关的服务注册
             context.AddConventionalRegistrar<InitializationConventionalRegistrar>();
         }
@@ -49,7 +49,7 @@ namespace Scorpio
             // 注册环境作用域提供程序的泛型实现
             // 使用 AmbientDataContextAmbientScopeProvider 作为默认实现
             context.Services.TryAddSingleton(typeof(IAmbientScopeProvider<>), typeof(AmbientDataContextAmbientScopeProvider<>));
-            
+
             // 注册取消令牌提供程序，使用不支持取消的单例实例
             // NoneCancellationTokenProvider.Instance 提供永不取消的令牌
             context.Services.TryAddSingleton<ICancellationTokenProvider>(NoneCancellationTokenProvider.Instance);

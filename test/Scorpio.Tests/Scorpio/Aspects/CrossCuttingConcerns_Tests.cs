@@ -102,7 +102,7 @@ namespace Scorpio.Aspects
 
             // Act
             CrossCuttingConcerns.RemoveApplied(testObj, "NonExistentConcern");
-           concerns.ShouldBe(testObj.AppliedCrossCuttingConcerns);
+            concerns.ShouldBe(testObj.AppliedCrossCuttingConcerns);
         }
 
         [Fact]

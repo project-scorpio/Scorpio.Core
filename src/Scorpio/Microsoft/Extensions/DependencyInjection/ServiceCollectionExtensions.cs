@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var config = new ConventionalConfiguration<TAction>(services, types);
             // 执行配置操作，允许用户自定义约定规则
             configureAction(config);
-            
+
             // 使用反射创建约定动作实例，支持访问非公共构造函数
             var action = Activator.CreateInstance(
                 typeof(TAction),
@@ -47,7 +47,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 null,
                 new object[] { config },
                 null) as TAction;
-                
+
             // 执行约定动作的核心逻辑
             action.Action();
             return services;
@@ -66,7 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection RegisterConventionalDependencyInject(
             this IServiceCollection services,
             IEnumerable<Type> types,
-            Action<IConventionalConfiguration<ConventionalDependencyAction>> configureAction) => 
+            Action<IConventionalConfiguration<ConventionalDependencyAction>> configureAction) =>
             // 委托给通用的约定操作方法处理
             services.DoConventionalAction(types, configureAction);
 
@@ -261,7 +261,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 // 移除所有相同服务类型的注册
                 services.RemoveAll(s => s.ServiceType == serviceDescriptor.ServiceType);
             }
-            
+
             // 添加新的服务描述符
             services.Add(serviceDescriptor);
             return services;
@@ -282,9 +282,9 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection ReplaceEnumerable<TService, TSourceImplementation, TDestinationImplementation>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient)
             where TService : class
             where TSourceImplementation : class, TService
-            where TDestinationImplementation : class, TService => 
+            where TDestinationImplementation : class, TService =>
             services.ReplaceEnumerable(
-                ServiceDescriptor.Transient<TService, TSourceImplementation>(), 
+                ServiceDescriptor.Transient<TService, TSourceImplementation>(),
                 ServiceDescriptor.Describe(typeof(TService), typeof(TDestinationImplementation), lifetime));
 
         /// <summary>
@@ -300,7 +300,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <seealso cref="GetImplementationType"/>
         public static IServiceCollection ReplaceEnumerable(
             this IServiceCollection services,
-            ServiceDescriptor sourcedescriptor, 
+            ServiceDescriptor sourcedescriptor,
             ServiceDescriptor destdescriptor)
         {
             Check.NotNull(services, nameof(services));
@@ -340,7 +340,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <seealso cref="RemoveEnumerable(IServiceCollection, ServiceDescriptor)"/>
         public static IServiceCollection RemoveEnumerable<TService, TImplementation>(this IServiceCollection services)
             where TService : class
-            where TImplementation : class, TService => 
+            where TImplementation : class, TService =>
             services.RemoveEnumerable(ServiceDescriptor.Transient<TService, TImplementation>());
 
         /// <summary>

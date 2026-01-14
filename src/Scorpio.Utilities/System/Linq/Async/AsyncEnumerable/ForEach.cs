@@ -77,7 +77,7 @@ namespace System.Linq.Async
             Check.NotNull(action, nameof(action));
 
             await Core(enumerable, action, cancellationToken);
-            
+
             // <summary>
             // 核心实现方法，提供索引功能
             // </summary>
@@ -118,7 +118,7 @@ namespace System.Linq.Async
             Check.NotNull(action, nameof(action));
 
             await Core(enumerable, action, cancellationToken);
-            
+
             // <summary>
             // 核心实现方法，支持异步操作
             // </summary>
@@ -155,9 +155,9 @@ namespace System.Linq.Async
         {
             Check.NotNull(enumerable, nameof(enumerable));
             Check.NotNull(action, nameof(action));
-            
+
             return Core(enumerable, action, cancellationToken);
-            
+
             // <summary>
             // 核心实现方法，支持取消令牌传递
             // </summary>
@@ -197,7 +197,7 @@ namespace System.Linq.Async
             Check.NotNull(action, nameof(action));
 
             return Core(enumerable, action, cancellationToken);
-            
+
             // <summary>
             // 核心实现方法，提供索引和取消令牌功能
             // </summary>

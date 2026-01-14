@@ -123,12 +123,12 @@ namespace System.Collections.Generic
         /// <seealso cref="Action{T}"/>
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
-            
+
             if (source.IsNullOrEmpty() || action == null)
             {
                 return;
             }
-            
+
             foreach (var item in source)
             {
                 action(item);
@@ -151,12 +151,12 @@ namespace System.Collections.Generic
         /// <seealso cref="CancellationToken"/>
         /// <seealso cref="Task"/>
         public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> action, CancellationToken cancellationToken = default)
-        {            
+        {
             if (source.IsNullOrEmpty() || action == null)
             {
                 return;
             }
-            
+
             foreach (var item in source)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -187,7 +187,7 @@ namespace System.Collections.Generic
             {
                 return;
             }
-            
+
             foreach (var item in source)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -218,7 +218,7 @@ namespace System.Collections.Generic
         {
             Check.NotNull(source, nameof(source));
             Check.NotNull(predicate, nameof(predicate));
-            
+
             foreach (var item in source)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -248,7 +248,7 @@ namespace System.Collections.Generic
         {
             Check.NotNull(source, nameof(source));
             Check.NotNull(predicate, nameof(predicate));
-            
+
             foreach (var item in source)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -281,7 +281,7 @@ namespace System.Collections.Generic
         {
             Check.NotNull(source, nameof(source));
             Check.NotNull(predicate, nameof(predicate));
-            
+
             foreach (var item in source)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -311,7 +311,7 @@ namespace System.Collections.Generic
         {
             Check.NotNull(source, nameof(source));
             Check.NotNull(predicate, nameof(predicate));
-            
+
             foreach (var item in source)
             {
                 cancellationToken.ThrowIfCancellationRequested();

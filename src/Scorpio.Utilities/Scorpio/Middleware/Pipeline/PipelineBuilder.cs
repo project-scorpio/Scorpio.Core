@@ -118,13 +118,13 @@ namespace Scorpio.Middleware.Pipeline
         {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(middlewareType, nameof(middlewareType));
-            
+
             builder.Use(next =>
             {
                 // 查找Invoke或InvokeAsync方法
                 var methods = middlewareType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
                     .Where(m => m.Name.IsIn("Invoke", "InvokeAsync")).ToArray();
-                
+
                 // 验证方法数量
                 if (methods.Length > 1)
                 {
@@ -135,17 +135,17 @@ namespace Scorpio.Middleware.Pipeline
                 {
                     throw new InvalidOperationException($"中间件类型 {middlewareType.Name} 必须包含Invoke或InvokeAsync方法");
                 }
-                
+
                 var methodinfo = methods[0];
-                
+
                 // 验证返回类型
                 if (!typeof(Task).IsAssignableFrom(methodinfo.ReturnType))
                 {
                     throw new InvalidOperationException($"中间件方法 {methodinfo.Name} 必须返回Task类型");
                 }
-                
+
                 var parameters = methodinfo.GetParameters();
-                
+
                 // 验证第一个参数
                 if (parameters.Length == 0 || parameters[0].ParameterType != typeof(TPipelineContext))
                 {
@@ -156,10 +156,10 @@ namespace Scorpio.Middleware.Pipeline
                 var ctorArgs = new object[args.Length + 1];
                 ctorArgs[0] = next;
                 Array.Copy(args, 0, ctorArgs, 1, args.Length);
-                
+
                 // 创建中间件实例
                 var instance = ActivatorUtilities.CreateInstance(builder.ApplicationServices, middlewareType, ctorArgs);
-                
+
                 // 如果只有一个参数，直接创建委托
                 if (parameters.Length == 1)
                 {
@@ -180,7 +180,7 @@ namespace Scorpio.Middleware.Pipeline
                     return factory(instance, context, serviceProvider);
                 };
             });
-            
+
             return builder;
         }
 
@@ -208,7 +208,7 @@ namespace Scorpio.Middleware.Pipeline
 
             var methodArguments = new Expression[parameters.Length];
             methodArguments[0] = httpContextArg;
-            
+
             // 为每个依赖注入参数生成服务解析表达式
             for (var i = 1; i < parameters.Length; i++)
             {

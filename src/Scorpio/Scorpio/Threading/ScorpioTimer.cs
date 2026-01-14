@@ -46,17 +46,17 @@ namespace Scorpio.Threading
         /// 内部使用的 .NET <see cref="Timer"/> 实例
         /// </summary>
         private readonly Timer _taskTimer;
-        
+
         /// <summary>
         /// 指示计时器是否正在执行任务的易失性标志
         /// </summary>
         private volatile bool _performingTasks;
-        
+
         /// <summary>
         /// 指示计时器是否正在运行的易失性标志
         /// </summary>
         private volatile bool _isRunning;
-        
+
         /// <summary>
         /// 指示对象是否已被释放的标志
         /// </summary>
@@ -83,7 +83,7 @@ namespace Scorpio.Threading
             {
                 throw new ScorpioException("Period should be set before starting the timer!");
             }
-            
+
             // 使用锁定扩展方法确保线程安全
             _taskTimer.Locking(t =>
             {
@@ -103,7 +103,7 @@ namespace Scorpio.Threading
             {
                 // 停止计时器
                 t.Change(Timeout.Infinite, Timeout.Infinite);
-                
+
                 // 等待当前任务完成
                 while (_performingTasks)
                 {
@@ -139,7 +139,7 @@ namespace Scorpio.Threading
                 // 触发 Elapsed 事件
                 Elapsed?.Invoke(this, new EventArgs());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 // 忽略事件处理程序中的异常
                 Logger.LogError(ex, "An error occurred while executing the Elapsed event handlers.");

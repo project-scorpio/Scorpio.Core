@@ -33,7 +33,7 @@ namespace Scorpio.Options
         /// </remarks>
         /// <exception cref="System.ArgumentNullException">当 <paramref name="options"/> 或 <paramref name="name"/> 为 null 时抛出</exception>
         /// <exception cref="System.InvalidCastException">当存储的值无法转换为 <typeparamref name="TOption"/> 类型时抛出</exception>
-        public static TOption GetOption<TOption>(this ExtensibleOptions options, string name) => 
+        public static TOption GetOption<TOption>(this ExtensibleOptions options, string name) =>
             (TOption)options.ExtendedOption.GetOrAdd(name, () => default(TOption));
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Scorpio.Options
         /// </para>
         /// </remarks>
         /// <exception cref="System.ArgumentNullException">当 <paramref name="options"/> 或 <paramref name="name"/> 为 null 时抛出</exception>
-        public static void SetOption<TOption>(this ExtensibleOptions options, string name, TOption option) => 
+        public static void SetOption<TOption>(this ExtensibleOptions options, string name, TOption option) =>
             options.ExtendedOption[name] = option;
     }
 }
