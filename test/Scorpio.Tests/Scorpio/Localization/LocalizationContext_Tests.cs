@@ -27,5 +27,57 @@ namespace Scorpio.Localization
                 c.LocalizerFactory.ShouldBe(factory);
             });
         }
+
+        [Fact]
+        public void Use_ShouldSetAndRestoreCurrent()
+        {
+            LocalizationContext.Current.ShouldBeNull();
+            var sp = Substitute.For<IServiceProvider>();
+            var factory = Substitute.For<IStringLocalizerFactory>();
+            sp.Configure().GetService(typeof(IStringLocalizerFactory)).Returns(factory);
+            var context = new LocalizationContext(sp);
+            using (LocalizationContext.Use(context))
+            {
+                LocalizationContext.Current.ShouldBe(context);
+            }
+            LocalizationContext.Current.ShouldBeNull();
+        }
+
+        [Fact]
+        public void Use_ShouldSupportNesting()
+        {
+            var sp = Substitute.For<IServiceProvider>();
+            var factory = Substitute.For<IStringLocalizerFactory>();
+            sp.Configure().GetService(typeof(IStringLocalizerFactory)).Returns(factory);
+            var outer = new LocalizationContext(sp);
+            var inner = new LocalizationContext(sp);
+            using (LocalizationContext.Use(outer))
+            {
+                LocalizationContext.Current.ShouldBe(outer);
+                using (LocalizationContext.Use(inner))
+                {
+                    LocalizationContext.Current.ShouldBe(inner);
+                }
+                LocalizationContext.Current.ShouldBe(outer);
+            }
+        }
+
+        [Fact]
+        public void Use_WithNull_ShouldSetCurrentToNull()
+        {
+            var sp = Substitute.For<IServiceProvider>();
+            var factory = Substitute.For<IStringLocalizerFactory>();
+            sp.Configure().GetService(typeof(IStringLocalizerFactory)).Returns(factory);
+            var context = new LocalizationContext(sp);
+            using (LocalizationContext.Use(context))
+            {
+                LocalizationContext.Current.ShouldBe(context);
+                using (LocalizationContext.Use(null))
+                {
+                    LocalizationContext.Current.ShouldBeNull();
+                }
+                LocalizationContext.Current.ShouldBe(context);
+            }
+        }
     }
 }

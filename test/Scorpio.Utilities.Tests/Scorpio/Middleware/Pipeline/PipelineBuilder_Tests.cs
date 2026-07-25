@@ -126,5 +126,83 @@ namespace Scorpio.Middleware.Pipeline
             Should.NotThrow(() => builder.Build()(context));
             context.PipelineInvoked.ShouldBeTrue();
         }
+
+        [Fact]
+        public void Use_WithSimpleDelegate_ShouldInvokeMiddleware()
+        {
+            var descriptors = new ServiceCollection();
+            var serviceProvider = descriptors.BuildServiceProvider();
+            var builder = new TestPipelineBuilder(serviceProvider);
+            builder.Use((context, next) =>
+            {
+                context.PipelineInvoked = true;
+                return next();
+            });
+            var context = new TestPipelineContext();
+            context.PipelineInvoked.ShouldBeFalse();
+            builder.Build()(context);
+            context.PipelineInvoked.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void Use_WithSimpleDelegate_ShouldChainMiddlewares()
+        {
+            var descriptors = new ServiceCollection();
+            var serviceProvider = descriptors.BuildServiceProvider();
+            var builder = new TestPipelineBuilder(serviceProvider);
+            var log = new System.Collections.Generic.List<int>();
+            builder.Use(async (context, next) =>
+            {
+                log.Add(1);
+                await next();
+                log.Add(3);
+            });
+            builder.Use(async (context, next) =>
+            {
+                log.Add(2);
+                await next();
+            });
+            builder.Build()(new TestPipelineContext());
+            log.ShouldBe(new[] { 1, 2, 3 });
+        }
+
+        [Fact]
+        public void Use_WithRequestDelegate_ShouldInvokeMiddleware()
+        {
+            var descriptors = new ServiceCollection();
+            var serviceProvider = descriptors.BuildServiceProvider();
+            var builder = new TestPipelineBuilder(serviceProvider);
+            builder.Use((context, next) =>
+            {
+                context.PipelineInvoked = true;
+                return next(context);
+            });
+            var context = new TestPipelineContext();
+            context.PipelineInvoked.ShouldBeFalse();
+            builder.Build()(context);
+            context.PipelineInvoked.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void Use_WithRequestDelegate_ShouldChainMiddlewares()
+        {
+            var descriptors = new ServiceCollection();
+            var serviceProvider = descriptors.BuildServiceProvider();
+            var builder = new TestPipelineBuilder(serviceProvider);
+            var log = new System.Collections.Generic.List<int>();
+            builder.Use(async (context, next) =>
+            {
+                log.Add(1);
+                await next(context);
+                log.Add(3);
+            });
+            builder.Use(async (context, next) =>
+            {
+                log.Add(2);
+                await next(context);
+            });
+            builder.Build()(new TestPipelineContext());
+            log.ShouldBe(new[] { 1, 2, 3 });
+        }
     }
 }

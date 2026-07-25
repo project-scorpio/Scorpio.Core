@@ -25,7 +25,9 @@ namespace Scorpio.Modularity.Plugins
             var context = Substitute.For<AssemblyLoadContext>();
             var list = new PlugInSourceList(fileProvider, context);
             var source = new FilePlugInSource(list, new string[] { "Test.dll" });
-            source.GetModules().Count().ShouldBe(5);
+            var expectedCount = Assembly.GetExecutingAssembly().GetTypes()
+                .Count(t => typeof(IScorpioModule).IsAssignableFrom(t) && !t.IsAbstract);
+            source.GetModules().Count().ShouldBe(expectedCount);
         }
     }
 }

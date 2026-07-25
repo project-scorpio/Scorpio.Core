@@ -26,7 +26,9 @@ namespace Scorpio.Modularity.Plugins
             var context = Substitute.For<AssemblyLoadContext>();
             var list = new PlugInSourceList(fileProvider, context);
             list.AddFile("test.dll");
-            list.GetAllModules().Count().ShouldBe(6);
+            var expectedCount = Assembly.GetExecutingAssembly().GetTypes()
+                .Count(t => typeof(IScorpioModule).IsAssignableFrom(t) && !t.IsAbstract) + 1;
+            list.GetAllModules().Count().ShouldBe(expectedCount);
 
         }
         [Fact]
@@ -38,8 +40,9 @@ namespace Scorpio.Modularity.Plugins
             var context = Substitute.For<AssemblyLoadContext>();
             var list = new PlugInSourceList(fileProvider, context);
             list.AddFolder("plugs", f => f == "Scorpio.Tests.dll");
-
-            list.GetAllModules().Count().ShouldBe(6);
+            var expectedCount = Assembly.GetExecutingAssembly().GetTypes()
+                .Count(t => typeof(IScorpioModule).IsAssignableFrom(t) && !t.IsAbstract) + 1;
+            list.GetAllModules().Count().ShouldBe(expectedCount);
 
         }
     }
