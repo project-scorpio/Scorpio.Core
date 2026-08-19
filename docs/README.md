@@ -18,6 +18,8 @@ Scorpio.Core 是一个**模块化、跨平台的 .NET 框架**（类 ABP 风格�
 
 | 文档 | 说明 |
 | --- | --- |
+| [键控服务兼容方案需求](./requirements/keyed-services-compatibility.md) | 为 .NET 8 以下目标框架补齐键控服务的详细需求、行为基线、实现方案与验收矩阵 |
+| [键控服务兼容层技术实现方案](./technical-design/keyed-services-compatibility.md) | 自研兼容层的架构、公开 API、注册表、容器包装、构造注入与集成步骤 |
 | [快速上手 / 使用指南](./getting-started.md) | 从零接入框架、模块开发、DI、Generic Host、Options、插件与异常处理示例 |
 | [架构说明](./architecture.md) | 程序集分层、启动流程、模块机制、核心扩展点与设计边界 |
 | [开发指南](./development-guide.md) | 开发环境、构建测试、Git 分支规则、新增项目/模块、测试与 GitHub Tag/Release 发版流程 |
