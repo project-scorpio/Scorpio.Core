@@ -163,3 +163,29 @@ test/Directory.Build.props           # TestRoot、IsPackable=false、ServerGarba
 
 - `Scorpio.Core.sln` / `Scorpio.Core.slnx`：传统与新版 XML 格式解决方案文件。
 - `Scorpio.Core.lutconfig`：LUT（Lightweight Unit Test）配置——启用并行构建、并行测试，单用例超时 180 秒。
+
+## 10. 键控服务兼容层
+
+`.NET 8` 在 `Microsoft.Extensions.DependencyInjection` 中引入键控服务，但 `netstandard2.0`~`net7.0`
+目标使用旧版 DI 包，不提供该能力。Scorpio.Core 不升级官方 DI 包版本，而是在
+`!NET8_0_OR_GREATER` 条件下提供自研键控服务兼容层：
+
+- 对外 API、命名空间与 .NET 8 原生一致：`AddKeyedSingleton/Scoped/Transient` 位于
+  `Microsoft.Extensions.DependencyInjection`，`TryAddKeyed*`、`RemoveAllKeyed` 位于
+  `Microsoft.Extensions.DependencyInjection.Extensions`，`GetKeyedService`、`GetRequiredKeyedService`、
+  `GetKeyedServices` 与 `KeyedService`、`FromKeyedServicesAttribute`、`ServiceKeyAttribute`、
+  `IKeyedServiceProvider`、`IServiceProviderIsKeyedService` 等辅助类型同命名空间提供。
+- 键控注册使用独立的 `KeyedServiceRegistry` 保存，通过 `KeyedServiceDescriptor : ServiceDescriptor`
+  表达，不与普通服务解析空间混合；`Bootstrapper.Create<T>()` 和 `AddScorpio<TStartupModule>()`
+  默认使用 `KeyedServiceProviderFactory` 包装底层 Microsoft 容器。
+- 支持键控 Singleton / Scoped / Transient 生命周期、作用域校验、`KeyedService.AnyKey` 兜底、
+  开放泛型、对象相等性键语义与 `null` 键。
+- 构造注入由 `KeyedServiceActivator` 实现：`[FromKeyedServices(key)]` 按键解析参数，
+  `[ServiceKey]` 注入当前解析使用的键；普通服务若构造函数使用键控特性，会在容器构建前
+  被替换为键控感知工厂。
+- `net8.0`/`net9.0`/`net10.0` 不编译兼容类型，继续使用原生键控服务，避免同名类型冲突。
+- 直接调用 `services.BuildServiceProvider()` 不会启用键控解析，应使用 Scorpio 框架路径或
+  兼容层提供的 `BuildKeyedServiceProvider()` 显式入口。
+
+详细需求与实现见 [键控服务兼容方案需求文档](requirements/keyed-services-compatibility.md) 和
+[键控服务兼容层技术实现方案](technical-design/keyed-services-compatibility.md)。

@@ -8,6 +8,9 @@ using Microsoft.Extensions.FileProviders;
 
 using Scorpio.Modularity;
 using Scorpio.Modularity.Plugins;
+#if !NET8_0_OR_GREATER
+using Scorpio.DependencyInjection.KeyedServices;
+#endif
 
 namespace Scorpio
 {
@@ -50,10 +53,15 @@ namespace Scorpio
 
         /// <summary>
         /// 获取或设置服务工厂适配器的创建函数。
+        /// 在 .NET 8 以下目标默认使用键控服务兼容工厂，在 .NET 8 及以上目标
         /// 默认使用 <see cref="DefaultServiceProviderFactory"/> 创建标准的依赖注入容器。
         /// </summary>
         /// <value>返回 <see cref="IServiceFactoryAdapter"/> 实例的函数</value>
+#if NET8_0_OR_GREATER
         internal Func<IServiceFactoryAdapter> ServiceFactory { get; set; } = () => new ServiceFactoryAdapter<IServiceCollection>(new DefaultServiceProviderFactory());
+#else
+        internal Func<IServiceFactoryAdapter> ServiceFactory { get; set; } = () => new ServiceFactoryAdapter<IServiceCollection>(new KeyedServiceProviderFactory());
+#endif
 
         /// <summary>
         /// 初始化 <see cref="BootstrapperCreationOptions"/> 类的新实例。
