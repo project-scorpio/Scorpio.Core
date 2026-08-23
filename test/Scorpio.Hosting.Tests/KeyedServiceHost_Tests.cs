@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
-
-using Moq;
 
 using Scorpio.Modularity;
 
@@ -23,37 +18,17 @@ namespace Scorpio.Hosting.Tests
         [Fact]
         public void Should_Resolve_Keyed_Service_From_Generic_Host()
         {
-            var context = new HostBuilderContext(new Dictionary<object, object>());
-            var services = new ServiceCollection();
-            var mock = new Mock<IHostBuilder>();
-            var factory = default(IServiceProviderFactory<IServiceCollection>);
-            mock.Setup(builder => builder.UseServiceProviderFactory(
-                    It.IsAny<Func<HostBuilderContext, IServiceProviderFactory<IServiceCollection>>>()))
-                .Callback<Func<HostBuilderContext, IServiceProviderFactory<IServiceCollection>>>(
-                    factorySelector => factory = factorySelector(context));
-            mock.Object.AddScorpio<KeyedServiceHostTestModule>();
-
-            if (factory is null)
+            var builder = new HostBuilder();
+            builder.ConfigureServices(services =>
             {
-                throw new InvalidOperationException("The service provider factory was not configured.");
-            }
+                services.AddSingleton<IHostLifetime, ConsoleLifetime>();
+                services.AddSingleton<IHostApplicationLifetime, ApplicationLifetime>();
+            });
+            builder.AddScorpio<KeyedServiceHostTestModule>();
 
-            factory.CreateBuilder(services);
-            services.AddSingleton<IHostLifetime, ConsoleLifetime>();
-            services.AddSingleton<IHostApplicationLifetime, ApplicationLifetime>();
-
-            var serviceProvider = factory.CreateServiceProvider(services);
-            try
-            {
-                serviceProvider
-                    .GetRequiredKeyedService<IHostCache>("sql")
-                    .ShouldBeOfType<HostSqlCache>();
-                serviceProvider.GetRequiredService<IBootstrapper>().ShouldBeOfType<InternalBootstrapper>();
-            }
-            finally
-            {
-                (serviceProvider as IDisposable)?.Dispose();
-            }
+            using var host = builder.Build();
+            host.Services.GetRequiredKeyedService<IHostCache>("sql").ShouldBeOfType<HostSqlCache>();
+            host.Services.GetRequiredService<IBootstrapper>().ShouldBeOfType<InternalBootstrapper>();
         }
     }
 
