@@ -16,18 +16,24 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public class KeyedService_Tests
     {
+        private const string PremiumKey = "premium";
+
+        private const string MissingKey = "missing";
+
+        private const string ConsumerKey = "consumer";
+
         [Fact]
         public void Should_Resolve_Different_Implementations_By_Key()
         {
             var services = new ServiceCollection();
-            services.AddKeyedSingleton<ICache>("premium", new PremiumCache());
+            services.AddKeyedSingleton<ICache>(PremiumKey, new PremiumCache());
             services.AddKeyedSingleton<ICache>("sql", new SqlCache());
 
             using (var provider = BuildProvider(services) as IDisposable)
             {
                 provider.ShouldNotBeNull();
                 var serviceProvider = (IServiceProvider)provider;
-                serviceProvider.GetRequiredKeyedService<ICache>("premium").ShouldBeOfType<PremiumCache>();
+                serviceProvider.GetRequiredKeyedService<ICache>(PremiumKey).ShouldBeOfType<PremiumCache>();
                 serviceProvider.GetRequiredKeyedService<ICache>("sql").ShouldBeOfType<SqlCache>();
             }
         }
@@ -37,13 +43,13 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var services = new ServiceCollection();
             services.AddSingleton<ICache>(new MemoryCache());
-            services.AddKeyedSingleton<ICache>("premium", new PremiumCache());
+            services.AddKeyedSingleton<ICache>(PremiumKey, new PremiumCache());
 
             using (var provider = BuildProvider(services) as IDisposable)
             {
                 var serviceProvider = (IServiceProvider)provider;
                 serviceProvider.GetRequiredService<ICache>().ShouldBeOfType<MemoryCache>();
-                serviceProvider.GetRequiredKeyedService<ICache>("premium").ShouldBeOfType<PremiumCache>();
+                serviceProvider.GetRequiredKeyedService<ICache>(PremiumKey).ShouldBeOfType<PremiumCache>();
             }
         }
 
@@ -53,7 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var services = new ServiceCollection();
             using (var provider = BuildProvider(services) as IDisposable)
             {
-                ((IServiceProvider)provider).GetKeyedService<ICache>("missing").ShouldBeNull();
+                ((IServiceProvider)provider).GetKeyedService<ICache>(MissingKey).ShouldBeNull();
             }
         }
 
@@ -64,7 +70,7 @@ namespace Microsoft.Extensions.DependencyInjection
             using (var provider = BuildProvider(services) as IDisposable)
             {
                 Should.Throw<InvalidOperationException>(() =>
-                    ((IServiceProvider)provider).GetRequiredKeyedService<ICache>("missing"));
+                    ((IServiceProvider)provider).GetRequiredKeyedService<ICache>(MissingKey));
             }
         }
 
@@ -103,12 +109,12 @@ namespace Microsoft.Extensions.DependencyInjection
         public void Should_Match_Key_By_Object_Equality()
         {
             var services = new ServiceCollection();
-            services.AddKeyedSingleton<ICache>(new CustomKey("premium"), new PremiumCache());
+            services.AddKeyedSingleton<ICache>(new CustomKey(PremiumKey), new PremiumCache());
 
             using (var provider = BuildProvider(services) as IDisposable)
             {
                 ((IServiceProvider)provider)
-                    .GetRequiredKeyedService<ICache>(new CustomKey("premium"))
+                    .GetRequiredKeyedService<ICache>(new CustomKey(PremiumKey))
                     .ShouldBeOfType<PremiumCache>();
             }
         }
@@ -150,12 +156,12 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var services = new ServiceCollection();
             services.AddKeyedSingleton<ICache>(KeyedService.AnyKey, new MemoryCache());
-            services.AddKeyedSingleton<ICache>("premium", new PremiumCache());
+            services.AddKeyedSingleton<ICache>(PremiumKey, new PremiumCache());
 
             using (var provider = BuildProvider(services) as IDisposable)
             {
                 ((IServiceProvider)provider)
-                    .GetRequiredKeyedService<ICache>("premium")
+                    .GetRequiredKeyedService<ICache>(PremiumKey)
                     .ShouldBeOfType<PremiumCache>();
             }
         }
@@ -169,9 +175,9 @@ namespace Microsoft.Extensions.DependencyInjection
             using (var provider = BuildProvider(services) as IDisposable)
             {
                 var serviceProvider = (IServiceProvider)provider;
-                serviceProvider.GetRequiredKeyedService<ICache>("missing").ShouldBeOfType<MemoryCache>();
+                serviceProvider.GetRequiredKeyedService<ICache>(MissingKey).ShouldBeOfType<MemoryCache>();
                 serviceProvider.GetRequiredService<IServiceProviderIsKeyedService>()
-                    .IsKeyedService(typeof(ICache), "missing")
+                    .IsKeyedService(typeof(ICache), MissingKey)
                     .ShouldBeTrue();
             }
         }
@@ -220,7 +226,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             using (var provider = BuildProvider(services) as IDisposable)
             {
-                var caches = ((IServiceProvider)provider).GetKeyedServices<ICache>("missing").ToList();
+                var caches = ((IServiceProvider)provider).GetKeyedServices<ICache>(MissingKey).ToList();
                 caches.Count.ShouldBe(2);
                 caches[0].ShouldBeOfType<MemoryCache>();
                 caches[1].ShouldBeOfType<PremiumCache>();
@@ -285,7 +291,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var services = new ServiceCollection();
             services.AddKeyedSingleton(typeof(ICache), "disposable", typeof(DisposableCache));
 
-            var provider = (IServiceProvider)BuildProvider(services);
+            var provider = BuildProvider(services);
             var instance = provider.GetRequiredKeyedService<ICache>("disposable").ShouldBeOfType<DisposableCache>();
             ((IDisposable)provider).Dispose();
             instance.Disposed.ShouldBeTrue();
@@ -298,7 +304,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddKeyedScoped(typeof(ICache), "scoped", typeof(DisposableCache));
             services.AddKeyedTransient(typeof(ICache), "transient", typeof(DisposableCache));
 
-            var provider = (IServiceProvider)BuildProvider(services);
+            var provider = BuildProvider(services);
             try
             {
                 DisposableCache scoped;
@@ -326,13 +332,13 @@ namespace Microsoft.Extensions.DependencyInjection
         public void Should_Inject_FromKeyedServices_Into_Keyed_Service()
         {
             var services = new ServiceCollection();
-            services.AddKeyedSingleton<ICache>("premium", new PremiumCache());
-            services.AddKeyedSingleton<IConsumer, KeyedConsumer>("consumer");
+            services.AddKeyedSingleton<ICache>(PremiumKey, new PremiumCache());
+            services.AddKeyedSingleton<IConsumer, KeyedConsumer>(ConsumerKey);
 
             using (var provider = BuildProvider(services) as IDisposable)
             {
                 ((IServiceProvider)provider)
-                    .GetRequiredKeyedService<IConsumer>("consumer")
+                    .GetRequiredKeyedService<IConsumer>(ConsumerKey)
                     .Cache.ShouldBeOfType<PremiumCache>();
             }
         }
@@ -341,7 +347,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public void Should_Inject_FromKeyedServices_Into_Ordinary_Service()
         {
             var services = new ServiceCollection();
-            services.AddKeyedSingleton<ICache>("premium", new PremiumCache());
+            services.AddKeyedSingleton<ICache>(PremiumKey, new PremiumCache());
             services.AddSingleton<IConsumer, KeyedConsumer>();
 
             using (var provider = BuildProvider(services) as IDisposable)
@@ -356,13 +362,13 @@ namespace Microsoft.Extensions.DependencyInjection
         public void Should_Inject_ServiceKey_When_Type_Matches()
         {
             var services = new ServiceCollection();
-            services.AddKeyedSingleton<StringKeyConsumer>("consumer");
+            services.AddKeyedSingleton<StringKeyConsumer>(ConsumerKey);
 
             using (var provider = BuildProvider(services) as IDisposable)
             {
                 ((IServiceProvider)provider)
-                    .GetRequiredKeyedService<StringKeyConsumer>("consumer")
-                    .Key.ShouldBe("consumer");
+                    .GetRequiredKeyedService<StringKeyConsumer>(ConsumerKey)
+                    .Key.ShouldBe(ConsumerKey);
             }
         }
 
@@ -370,12 +376,12 @@ namespace Microsoft.Extensions.DependencyInjection
         public void Should_Throw_When_ServiceKey_Type_Does_Not_Match()
         {
             var services = new ServiceCollection();
-            services.AddKeyedSingleton<IntKeyConsumer>("consumer");
+            services.AddKeyedSingleton<IntKeyConsumer>(ConsumerKey);
 
             using (var provider = BuildProvider(services) as IDisposable)
             {
                 Should.Throw<InvalidOperationException>(() =>
-                    ((IServiceProvider)provider).GetRequiredKeyedService<IntKeyConsumer>("consumer"));
+                    ((IServiceProvider)provider).GetRequiredKeyedService<IntKeyConsumer>(ConsumerKey));
             }
         }
 
@@ -434,7 +440,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 var keyedProvider = ((IServiceProvider)provider).GetRequiredService<IServiceProviderIsKeyedService>();
                 keyedProvider.IsKeyedService(typeof(ICache), "sql").ShouldBeTrue();
-                keyedProvider.IsKeyedService(typeof(ICache), "missing").ShouldBeFalse();
+                keyedProvider.IsKeyedService(typeof(ICache), MissingKey).ShouldBeFalse();
             }
         }
 
@@ -558,7 +564,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// 开放泛型仓储测试接口。
     /// </summary>
     /// <typeparam name="T">仓储元素类型</typeparam>
-    public interface IRepository<T>
+    public interface IRepository<out T>
     {
         /// <summary>
         /// 获取仓储元素类型。
@@ -589,7 +595,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// 解析仓储元素。
         /// </summary>
         /// <returns>仓储元素</returns>
-        public T Get() => default!;
+        public T Get() => default;
     }
 
     /// <summary>
