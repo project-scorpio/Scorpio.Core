@@ -33,6 +33,11 @@ namespace Scorpio.Hosting.Tests
                     factorySelector => factory = factorySelector(context));
             mock.Object.AddScorpio<KeyedServiceHostTestModule>();
 
+            if (factory is null)
+            {
+                throw new InvalidOperationException("The service provider factory was not configured.");
+            }
+
             factory.CreateBuilder(services);
             services.AddSingleton<IHostLifetime, ConsoleLifetime>();
             services.AddSingleton<IHostApplicationLifetime, ApplicationLifetime>();
