@@ -504,7 +504,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// 可释放缓存实现。
     /// </summary>
-    public class DisposableCache : ICache, IDisposable
+    public sealed class DisposableCache : ICache, IDisposable
     {
         /// <summary>
         /// 获取缓存实现名称。
@@ -565,6 +565,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <value>元素类型</value>
         Type ItemType { get; }
+
+        /// <summary>
+        /// 解析仓储元素。
+        /// </summary>
+        /// <returns>仓储元素</returns>
+        T Get();
     }
 
     /// <summary>
@@ -578,6 +584,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <value>元素类型</value>
         public Type ItemType => typeof(T);
+
+        /// <summary>
+        /// 解析仓储元素。
+        /// </summary>
+        /// <returns>仓储元素</returns>
+        public T Get() => default!;
     }
 
     /// <summary>
