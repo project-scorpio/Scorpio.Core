@@ -9,6 +9,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
+if ($PSVersionTable.PSVersion -ge [version]'7.3') {
+    $PSNativeCommandUseErrorActionPreference = $false
+}
 $RepoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 try {
