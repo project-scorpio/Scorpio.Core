@@ -177,17 +177,19 @@ namespace Scorpio.Threading
         }
 
         [Fact]
-        public async Task Stop_ShouldWaitForRunningHandler_ToComplete()
+        public void Stop_ShouldWaitForRunningHandler_ToComplete()
         {
             using var timer = new ScorpioTimer { Period = 50, RunOnStart = true };
+            using var handlerStarted = new ManualResetEventSlim(false);
             var handlerCompleted = false;
             timer.Elapsed += (_, _) =>
             {
+                handlerStarted.Set();
                 Thread.Sleep(200);
                 handlerCompleted = true;
             };
             timer.Start();
-            await Task.Delay(80);   // let handler start
+            handlerStarted.Wait(TimeSpan.FromSeconds(5)).ShouldBeTrue();
             timer.Stop();
             handlerCompleted.ShouldBeTrue();
         }
