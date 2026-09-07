@@ -95,6 +95,7 @@ public class BuildService
         var testSettings=new DotNetTestSettings{ 
             Configuration=_context.Environment.Configuration,
             NoBuild= true,
+            Framework= "net10.0"
 
         };
         var coverletSettings = new CoverletSettings {
