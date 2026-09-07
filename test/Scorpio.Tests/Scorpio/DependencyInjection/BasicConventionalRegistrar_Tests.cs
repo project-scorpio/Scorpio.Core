@@ -30,7 +30,7 @@ namespace Scorpio.DependencyInjection
 
             var descriptor = services.FirstOrDefault(d => d.ImplementationType == typeof(MySingletonService));
             descriptor.ShouldNotBeNull();
-            descriptor.Lifetime.ShouldBe(ServiceLifetime.Singleton);
+            descriptor!.Lifetime.ShouldBe(ServiceLifetime.Singleton);
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace Scorpio.DependencyInjection
 
             var descriptor = services.FirstOrDefault(d => d.ImplementationType == typeof(MyTransientService));
             descriptor.ShouldNotBeNull();
-            descriptor.Lifetime.ShouldBe(ServiceLifetime.Transient);
+            descriptor!.Lifetime.ShouldBe(ServiceLifetime.Transient);
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Scorpio.DependencyInjection
 
             var descriptor = services.FirstOrDefault(d => d.ImplementationType == typeof(MyScopedService));
             descriptor.ShouldNotBeNull();
-            descriptor.Lifetime.ShouldBe(ServiceLifetime.Scoped);
+            descriptor!.Lifetime.ShouldBe(ServiceLifetime.Scoped);
         }
 
         [Fact]
