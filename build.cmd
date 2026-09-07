@@ -1,2 +1,3 @@
-@echo off
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0build.ps1" %*
+@Echo Off
+
+powershell -f ./build.ps1 --Configuration=Release
