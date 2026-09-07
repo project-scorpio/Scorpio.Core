@@ -1,125 +1,154 @@
-[CmdletBinding()]
-param(
-    [ValidateSet('InstallSdk','Restore','Build','Test','Pack','Publish')]
-    [string[]]$Target = @(),
-    [ValidateSet('Debug','Release')]
-    [string]$Configuration = 'Release',
-    [switch]$TestAllFrameworks
-)
+#!/usr/bin/env pwsh
+$DotNetInstallerUri = 'https://dot.net/v1/dotnet-install.ps1';
+$DotNetUnixInstallerUri = 'https://dot.net/v1/dotnet-install.sh'
+$DotNetChannel = 'LTS'
+$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
 
-$RepoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-
-try {
-    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
-} catch {
+[string] $CakeVersion = ''
+[string] $DotNetVersion= ''
+foreach($line in Get-Content (Join-Path $PSScriptRoot 'build.config'))
+{
+  if ($line -like 'CAKE_VERSION=*') {
+      $CakeVersion = $line.SubString(13)
+  }
+  elseif ($line -like 'DOTNET_VERSION=*') {
+      $DotNetVersion =$line.SubString(15)
+  }
 }
 
-function Read-RequiredSdk {
-    $defaultVersion = '10.0.100'
-    $configPath = Join-Path $RepoRoot 'build.config'
-    if (-not (Test-Path $configPath)) { return $defaultVersion }
-    $match = Select-String -Path $configPath -Pattern '^\s*DOTNET_VERSION=(.+?)\s*$' | Select-Object -First 1
-    if ($match -and $match.Matches[0].Groups[1].Value) { return $match.Matches[0].Groups[1].Value.Trim() }
-    return $defaultVersion
+
+if ([string]::IsNullOrEmpty($CakeVersion) -or [string]::IsNullOrEmpty($DotNetVersion)) {
+    'Failed to parse Cake / .NET Core SDK Version'
+    exit 1
 }
 
-function Get-SdkVersion {
-    $dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
-    if (-not $dotnet) { return $null }
+# Make sure tools folder exists
+$ToolPath = Join-Path $PSScriptRoot "tools"
+if (!(Test-Path $ToolPath)) {
+    Write-Verbose "Creating tools directory..."
+    New-Item -Path $ToolPath -Type Directory -Force | out-null
+}
+
+
+if ($PSVersionTable.PSEdition -ne 'Core') {
+    # Attempt to set highest encryption available for SecurityProtocol.
+    # PowerShell will not set this by default (until maybe .NET 4.6.x). This
+    # will typically produce a message for PowerShell v2 (just an info
+    # message though)
     try {
-        $version = (& dotnet --version 2>$null | Select-Object -First 1)
-        if ($version) { return [System.Version]($version.ToString().Trim()) }
-    } catch {
+        # Set TLS 1.2 (3072), then TLS 1.1 (768), then TLS 1.0 (192), finally SSL 3.0 (48)
+        # Use integers because the enumeration values for TLS 1.2 and TLS 1.1 won't
+        # exist in .NET 4.0, even though they are addressable if .NET 4.5+ is
+        # installed (.NET 4.5 is an in-place upgrade).
+        [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192 -bor 48
+      } catch {
+        Write-Output 'Unable to set PowerShell to use TLS 1.2 and TLS 1.1 due to old .NET Framework installed. If you see underlying connection closed or trust errors, you may need to upgrade to .NET Framework 4.5+ and PowerShell v3'
+      }
+}
+
+###########################################################################
+# INSTALL .NET CORE CLI
+###########################################################################
+
+$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+$env:DOTNET_CLI_TELEMETRY_OPTOUT=1
+$env:DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX=2
+
+
+Function Remove-PathVariable([string]$VariableToRemove)
+{
+    $SplitChar = ';'
+    if ($IsMacOS -or $IsLinux) {
+        $SplitChar = ':'
     }
-    return $null
-}
 
-function Ensure-Sdk {
-    param([string]$RequiredVersion)
-    $required = [System.Version]$RequiredVersion
-    $current = Get-SdkVersion
-    if ($current -and ($current.CompareTo($required) -ge 0)) { return }
-
-    $installDir = Join-Path $RepoRoot '.dotnet'
-    New-Item -ItemType Directory -Force -Path $installDir | Out-Null
-    $installer = Join-Path $installDir 'dotnet-install.ps1'
-    if (-not (Test-Path $installer)) {
-        (New-Object System.Net.WebClient).DownloadFile('https://dot.net/v1/dotnet-install.ps1', $installer)
+    $path = [Environment]::GetEnvironmentVariable("PATH", "User")
+    if ($path -ne $null)
+    {
+        $newItems = $path.Split($SplitChar, [StringSplitOptions]::RemoveEmptyEntries) | Where-Object { "$($_)" -inotlike $VariableToRemove }
+        [Environment]::SetEnvironmentVariable("PATH", [System.String]::Join($SplitChar, $newItems), "User")
     }
-    & $installer -Version $RequiredVersion -InstallDir $installDir -NoPath
 
-    $dotnetExe = Join-Path $installDir 'dotnet.exe'
-    if (-not (Test-Path $dotnetExe)) { throw "Failed to install .NET SDK $RequiredVersion" }
-    $installedVersion = (& $dotnetExe --version 2>$null | Select-Object -First 1)
-    if (-not $installedVersion) { throw "Failed to install .NET SDK $RequiredVersion" }
-
-    $env:DOTNET_ROOT = $installDir
-    $env:PATH = "$installDir$([IO.Path]::PathSeparator)$env:PATH"
-}
-
-function Invoke-DotNet {
-    param([string[]]$Cmd)
-    & dotnet @Cmd
-    if ($LASTEXITCODE -ne 0) { throw "Command failed: dotnet $($Cmd -join ' ')" }
-}
-
-function Get-PackageVersion {
-    [xml]$versionProps = Get-Content -Raw (Join-Path $RepoRoot 'versions.props')
-    $major = $versionProps.Project.PropertyGroup.VersionMajor
-    $minor = $versionProps.Project.PropertyGroup.VersionMinor
-    $patch = $versionProps.Project.PropertyGroup.VersionPatch
-    $suffix = $versionProps.Project.PropertyGroup.VersionSuffix
-    $prefix = "$major.$minor.$patch"
-    if ($suffix) { return "$prefix-$suffix" }
-    return $prefix
-}
-
-$solution = Get-ChildItem -Path $RepoRoot -Filter '*.sln' -File | Select-Object -First 1
-if (-not $solution) { throw "No solution file found in $RepoRoot" }
-
-$isTag = ($env:APPVEYOR_REPO_TAG -eq 'true')
-if ($Target.Count -eq 0) {
-    $Target = @('Restore', 'Build', 'Test')
-    if ($isTag) { $Target = @('Restore', 'Build', 'Test', 'Pack', 'Publish') }
-}
-
-Ensure-Sdk -RequiredVersion (Read-RequiredSdk)
-
-foreach ($item in $Target) {
-    switch ($item) {
-        'InstallSdk' {
-            Ensure-Sdk -RequiredVersion (Read-RequiredSdk)
-        }
-        'Restore' {
-            $cmd = @('restore', $solution.FullName)
-            if ($env:NUGET_CONFIG_FILE) { $cmd += @('--configfile', $env:NUGET_CONFIG_FILE) }
-            Invoke-DotNet $cmd
-        }
-        'Build' {
-            Invoke-DotNet @('build', $solution.FullName, '-c', $Configuration)
-        }
-        'Test' {
-            $cmd = @('test', $solution.FullName, '-c', $Configuration, '--no-build')
-            if (-not $TestAllFrameworks) { $cmd += @('-f', 'net10.0') }
-            Invoke-DotNet $cmd
-        }
-        'Pack' {
-            $artifacts = Join-Path $RepoRoot 'artifacts'
-            New-Item -ItemType Directory -Force -Path $artifacts | Out-Null
-            $version = Get-PackageVersion
-            Invoke-DotNet @('pack', $solution.FullName, '-c', $Configuration, '--no-build', '-o', $artifacts, "-p:Version=$version", "-p:PackageVersion=$version", '-p:IncludeSymbols=true', '-p:SymbolPackageFormat=snupkg')
-        }
-        'Publish' {
-            if (-not $isTag) { throw 'Publish is only enabled for tag builds.' }
-            $source = if ($env:NUGET_SOURCE) { $env:NUGET_SOURCE } else { 'https://api.nuget.org/v3/index.json' }
-            $apiKey = $env:NUGET_API_KEY
-            if (-not $apiKey) { throw 'NUGET_API_KEY environment variable is required to publish.' }
-            $artifacts = Join-Path $RepoRoot 'artifacts'
-            Get-ChildItem -Path $artifacts -Filter '*.nupkg' -File |
-                Where-Object { $_.Name -notlike '*.symbols.nupkg' } |
-                ForEach-Object {
-                    Invoke-DotNet @('nuget', 'push', $_.FullName, '--source', $source, '--api-key', $apiKey, '--skip-duplicate')
-                }
-        }
+    $path = [Environment]::GetEnvironmentVariable("PATH", "Process")
+    if ($path -ne $null)
+    {
+        $newItems = $path.Split($SplitChar, [StringSplitOptions]::RemoveEmptyEntries) | Where-Object { "$($_)" -inotlike $VariableToRemove }
+        [Environment]::SetEnvironmentVariable("PATH", [System.String]::Join($SplitChar, $newItems), "Process")
     }
 }
+
+# Get .NET Core CLI path if installed.
+$FoundDotNetCliVersion = $null;
+if (Get-Command dotnet -ErrorAction SilentlyContinue) {
+    $FoundDotNetCliVersion = dotnet --version;
+}
+
+if($FoundDotNetCliVersion -lt $DotNetVersion) {
+    $InstallPath = Join-Path $PSScriptRoot ".dotnet"
+    if (!(Test-Path $InstallPath)) {
+        New-Item -Path $InstallPath -ItemType Directory -Force | Out-Null;
+    }
+
+    if ($IsMacOS -or $IsLinux) {
+        $ScriptPath = Join-Path $InstallPath 'dotnet-install.sh'
+        (New-Object System.Net.WebClient).DownloadFile($DotNetUnixInstallerUri, $ScriptPath);
+        & bash $ScriptPath --version "$DotNetVersion" --install-dir "$InstallPath" --channel "$DotNetChannel" --no-path
+
+        Remove-PathVariable "$InstallPath"
+        $env:PATH = "$($InstallPath):$env:PATH"
+    }
+    else {
+        $ScriptPath = Join-Path $InstallPath 'dotnet-install.ps1'
+        (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, $ScriptPath);
+        & $ScriptPath -Channel $DotNetChannel -Version $DotNetVersion -InstallDir $InstallPath;
+
+        Remove-PathVariable "$InstallPath"
+        $env:PATH = "$InstallPath;$env:PATH"
+    }
+    $env:DOTNET_ROOT=$InstallPath
+}
+
+###########################################################################
+# INSTALL CAKE
+###########################################################################
+
+# Make sure Cake has been installed.
+[string] $CakeExePath = ''
+[string] $CakeInstalledVersion = Get-Command dotnet-cake -ErrorAction SilentlyContinue  | % {&$_.Source --version}
+
+if ($CakeInstalledVersion -ge $CakeVersion) {
+    # Cake found locally
+    $CakeExePath = (Get-Command dotnet-cake).Source
+}
+else {
+    $CakePath = [System.IO.Path]::Combine($ToolPath,'.store', 'cake.tool', $CakeVersion) # Old PowerShell versions Join-Path only supports one child path
+
+    $CakeExePath = (Get-ChildItem -Path $ToolPath -Filter "dotnet-cake*" -File| ForEach-Object FullName | Select-Object -First 1)
+
+
+    if ((!(Test-Path -Path $CakePath -PathType Container)) -or (!(Test-Path $CakeExePath -PathType Leaf))) {
+
+        if ((![string]::IsNullOrEmpty($CakeExePath)) -and (Test-Path $CakeExePath -PathType Leaf))
+        {
+            & dotnet tool uninstall --tool-path $ToolPath Cake.Tool
+        }
+
+        & dotnet tool install --tool-path $ToolPath --version $CakeVersion Cake.Tool
+        if ($LASTEXITCODE -ne 0)
+        {
+            'Failed to install cake'
+            exit 1
+        }
+        $CakeExePath = (Get-ChildItem -Path $ToolPath -Filter "dotnet-cake*" -File| ForEach-Object FullName | Select-Object -First 1)
+    }
+}
+
+###########################################################################
+# RUN BUILD SCRIPT
+###########################################################################
+& "$CakeExePath" ./build.cake --bootstrap
+if ($LASTEXITCODE -eq 0)
+{
+    & "$CakeExePath" ./build.cake $args
+}
+exit $LASTEXITCODE
