@@ -25,14 +25,18 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
 export DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX=2
 
-DOTNET_INSTALLED_VERSION=$(dotnet --version 2>&1)
+DOTNET_INSTALLED_VERSION=$(dotnet --version 2>/dev/null | head -n1)
 
-if [[ "$DOTNET_VERSION" > "$DOTNET_INSTALLED_VERSION" ]]; then
+version_ge() {
+    [ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -n1)" = "$2" ]
+}
+
+if [ -z "$DOTNET_INSTALLED_VERSION" ] || ! version_ge "$DOTNET_VERSION" "$DOTNET_INSTALLED_VERSION"; then
     echo "Installing .NET CLI..."
     if [ ! -d "$SCRIPT_DIR/.dotnet" ]; then
       mkdir "$SCRIPT_DIR/.dotnet"
     fi
-    curl -Lsfo "$SCRIPT_DIR/.dotnet/dotnet-install.sh" https://dot.net/v1/dotnet-install.sh
+    curl --proto '=https' --tlsv1.2 -Lsfo "$SCRIPT_DIR/.dotnet/dotnet-install.sh" https://dot.net/v1/dotnet-install.sh
     bash "$SCRIPT_DIR/.dotnet/dotnet-install.sh" --version $DOTNET_VERSION --install-dir .dotnet --no-path
     export PATH="$SCRIPT_DIR/.dotnet":$PATH
     export DOTNET_ROOT="$SCRIPT_DIR/.dotnet"
@@ -42,9 +46,9 @@ fi
 # INSTALL CAKE
 ###########################################################################
 
-CAKE_INSTALLED_VERSION=$(dotnet-cake --version 2>&1)
+CAKE_INSTALLED_VERSION=$(dotnet-cake --version 2>/dev/null | head -n1)
 
-if [[ "$CAKE_VERSION" > "$CAKE_INSTALLED_VERSION" ]]; then
+if [ -z "$CAKE_INSTALLED_VERSION" ] || ! version_ge "$CAKE_VERSION" "$CAKE_INSTALLED_VERSION"; then
     if [ ! -f "$CAKE_EXE" ] || [ ! -d "$CAKE_PATH" ]; then
         if [ -f "$CAKE_EXE" ]; then
             dotnet tool uninstall --tool-path $TOOLS_DIR Cake.Tool

@@ -80,10 +80,20 @@ Function Remove-PathVariable([string]$VariableToRemove)
 # Get .NET Core CLI path if installed.
 $FoundDotNetCliVersion = $null;
 if (Get-Command dotnet -ErrorAction SilentlyContinue) {
-    $FoundDotNetCliVersion = dotnet --version;
+    $FoundDotNetCliVersion = (& dotnet --version | Select-Object -First 1).ToString();
 }
 
-if($FoundDotNetCliVersion -lt $DotNetVersion) {
+$currentDotNetVersion = $null;
+if (-not [string]::IsNullOrWhiteSpace($FoundDotNetCliVersion)) {
+    try {
+        $currentDotNetVersion = [version]$FoundDotNetCliVersion.Trim();
+    } catch {
+        $currentDotNetVersion = $null;
+    }
+}
+
+$requiredDotNetVersion = [version]$DotNetVersion;
+if (-not $currentDotNetVersion -or $currentDotNetVersion -lt $requiredDotNetVersion) {
     $InstallPath = Join-Path $PSScriptRoot ".dotnet"
     if (!(Test-Path $InstallPath)) {
         New-Item -Path $InstallPath -ItemType Directory -Force | Out-Null;
@@ -116,7 +126,17 @@ if($FoundDotNetCliVersion -lt $DotNetVersion) {
 [string] $CakeExePath = ''
 [string] $CakeInstalledVersion = Get-Command dotnet-cake -ErrorAction SilentlyContinue  | % {&$_.Source --version}
 
-if ($CakeInstalledVersion -ge $CakeVersion) {
+$currentCakeVersion = $null;
+if (-not [string]::IsNullOrWhiteSpace($CakeInstalledVersion)) {
+    try {
+        $currentCakeVersion = [version]$CakeInstalledVersion.Trim();
+    } catch {
+        $currentCakeVersion = $null;
+    }
+}
+
+$requiredCakeVersion = [version]$CakeVersion;
+if ($currentCakeVersion -and $currentCakeVersion -ge $requiredCakeVersion) {
     # Cake found locally
     $CakeExePath = (Get-Command dotnet-cake).Source
 }
