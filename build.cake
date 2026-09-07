@@ -1,7 +1,7 @@
 #tool "nuget:?package=xunit.runner.console&version=2.4.2"
 #addin "nuget:?package=Cake.Sonar&version=6.0.1"
 #tool "nuget:?package=MSBuild.SonarQube.Runner.Tool&version=4.8.0"
-#addin nuget:?package=Cake.Coverlet&version=3.0.2
+#addin nuget:?package=Cake.Coverlet&version=6.0.1
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
