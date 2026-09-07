@@ -1,6 +1,6 @@
 #load "./index.cake"
 #addin "nuget:?package=Cake.Sonar&version=6.0.1"
-#addin nuget:?package=Cake.Coverlet&version=3.0.2
+#addin nuget:?package=Cake.Coverlet&version=6.0.1
 public class BuildService
 {
     private readonly ICakeContext _cakeContext;
@@ -76,7 +76,7 @@ public class BuildService
                 Key="project-scorpio_Scorpio.Core",
                 Organization="project-scorpio",
                 Url="https://sonarcloud.io",
-                Login=_cakeContext.EnvironmentVariable("SONAR_TOKEN"),
+                Token=_cakeContext.EnvironmentVariable("SONAR_TOKEN"),
                 OpenCoverReportsPath ="**/coverage.*.opencover.xml"
 
             }; 
