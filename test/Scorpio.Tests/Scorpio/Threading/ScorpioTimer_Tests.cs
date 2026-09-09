@@ -133,20 +133,26 @@ namespace Scorpio.Threading
         }
 
         [Fact]
-        public async Task Elapsed_ShouldNotOverlap_WhenHandlerIsSlowerThanPeriod()
+        public void Elapsed_ShouldNotOverlap_WhenHandlerIsSlowerThanPeriod()
         {
             using var timer = new ScorpioTimer { Period = 50 };
             var concurrent = 0;
             var maxConcurrent = 0;
+            var handlerCount = 0;
+            using var twoHandlersCompleted = new ManualResetEventSlim(false);
             timer.Elapsed += (_, _) =>
             {
                 var c = Interlocked.Increment(ref concurrent);
                 if (c > maxConcurrent) maxConcurrent = c;
                 Thread.Sleep(200);
                 Interlocked.Decrement(ref concurrent);
+                if (Interlocked.Increment(ref handlerCount) >= 2)
+                {
+                    twoHandlersCompleted.Set();
+                }
             };
             timer.Start();
-            await Task.Delay(600);
+            twoHandlersCompleted.Wait(TimeSpan.FromSeconds(10)).ShouldBeTrue();
             timer.Stop();
             maxConcurrent.ShouldBe(1);
         }
