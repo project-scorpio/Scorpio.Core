@@ -110,6 +110,9 @@ namespace Scorpio.Threading
                     Monitor.Wait(t);
                 }
 
+                // 正在执行的回调可能在等待期间重新安排了下一个周期，
+                // 因此必须再次取消计时器，避免在 Stop 返回后再次触发。
+                t.Change(Timeout.Infinite, Timeout.Infinite);
                 _isRunning = false;
             });
         }
