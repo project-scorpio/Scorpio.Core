@@ -66,6 +66,8 @@ public class BuildService
     public void Sonar(){
         if (string.IsNullOrWhiteSpace(_cakeContext.EnvironmentVariable("SONAR_TOKEN"))) {
             _cakeContext.Warning("Skipping Sonar analysis because SONAR_TOKEN is not set.");
+            Build();
+            Test();
             return;
         }
         var settings = GetSonarBeginSettings(); 
